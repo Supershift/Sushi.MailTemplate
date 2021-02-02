@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate", "Sushi.MailTemplate\Sushi.MailTemplate.csproj", "{D3FE73A9-EE3A-418F-BAC3-538491531A2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.Portal", "Sushi.MailTemplate.Portal\Sushi.MailTemplate.Portal.csproj", "{A6538971-7F28-46EE-A3F2-3105A4B56533}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.SendGrid", "Sushi.MailTemplate.SendGrid\Sushi.MailTemplate.SendGrid.csproj", "{5064271F-424F-4EDE-9BAD-C2FB232DC861}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.Test", "Sushi.MailTemplate.Test\Sushi.MailTemplate.Test.csproj", "{F5CFA48E-CD83-4C47-BD62-509109613F70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.UI", "Sushi.MailTemplate.UI\Sushi.MailTemplate.UI.csproj", "{BC39BD92-6B65-4594-AF23-340399032C6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC39BD92-6B65-4594-AF23-340399032C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC39BD92-6B65-4594-AF23-340399032C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC39BD92-6B65-4594-AF23-340399032C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC39BD92-6B65-4594-AF23-340399032C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0FFBBAF3-05D7-44F6-98B8-2055A0257E0C}
+	EndGlobalSection
+EndGlobal

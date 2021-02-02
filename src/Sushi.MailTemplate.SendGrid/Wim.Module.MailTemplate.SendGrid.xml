@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sushi.MailTemplate.SendGrid</name>
+    </assembly>
+    <members>
+        <member name="T:Sushi.MailTemplate.SendGrid.Email">
+            <summary>
+            E-mail to send
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.ID">
+            <summary>
+            ID
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.FromName">
+            <summary>
+            The name to display
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.From">
+            <summary>
+            The from e-mail address
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.To">
+            <summary>
+            The to e-mail address
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.Subject">
+            <summary>
+            The subject of the e-mail
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.Body">
+            <summary>
+            The body of the e-mail
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.Bccs">
+            <summary>
+            The list of bcc receivers, ";"-separated
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.TemplateName">
+            <summary>
+            The template name
+            </summary>
+        </member>
+        <member name="P:Sushi.MailTemplate.SendGrid.Email.CustomerGUID">
+            <summary>
+            The customer guid
+            </summary>
+        </member>
+        <member name="T:Sushi.MailTemplate.SendGrid.Mailer">
+            <summary>
+            SendGrid Mailer class to be used in conjunction with Wim.Module.MailTemplate
+            </summary>
+        </member>
+        <member name="M:Sushi.MailTemplate.SendGrid.Mailer.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Mailer Constructor
+            </summary>
+            <param name="emailStorageAccount"></param>
+            <param name="emailBlobContainer"></param>
+            <param name="emailQueueName"></param>
+            <param name="sendGridAPIKey"></param>
+        </member>
+        <member name="M:Sushi.MailTemplate.SendGrid.Mailer.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Mailer Constructor
+            </summary>
+            <param name="emailStorageAccount"></param>
+            <param name="emailBlobContainer"></param>
+            <param name="emailQueueName"></param>
+        </member>
+        <member name="M:Sushi.MailTemplate.SendGrid.Mailer.QueueMail(Sushi.MailTemplate.Data.MailTemplate,System.String,System.Nullable{System.Guid})">
+            <summary>
+            QueueMail inserts a queue message and saves the Data.MailTemplate mail in blob storage.
+            </summary>
+            <param name="mail">Data.MailTemplate with its properties filled</param>
+            <param name="emailTo">E-mail address to send to</param>
+            <param name="customerGUID">Optional customer GUID, which can be set to null</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sushi.MailTemplate.SendGrid.Mailer.QueueMailAsync(Sushi.MailTemplate.Data.MailTemplate,System.String,System.Nullable{System.Guid})">
+            <summary>
+            QueueMailAsync inserts a queue message and saves the Data.MailTemplate mail in blob storage.
+            </summary>
+            <param name="mail">Data.MailTemplate with its properties filled</param>
+            <param name="emailTo">E-mail address to send to</param>
+            <param name="customerGUID">Optional customer GUID, which can be set to null</param>
+        </member>
+        <member name="M:Sushi.MailTemplate.SendGrid.Mailer.SendMailAsync(Sushi.MailTemplate.SendGrid.Email)">
+            <summary>
+            Sends the e-mail from the provided email. Does not clean up blob like SendMailFromBlobAsync, you should do this yourself.
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sushi.MailTemplate.SendGrid.Mailer.SendMailFromBlobAsync(System.String)">
+            <summary>
+            Use SendMailAsync in an Azure Function that is triggered by a queue message. It expects an id to a blob.
+            </summary>
+            <param name="id">id of blob</param>
+        </member>
+    </members>
+</doc>
