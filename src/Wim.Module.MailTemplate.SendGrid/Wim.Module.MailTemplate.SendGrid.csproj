@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.2.0</Version>
+    <Authors>Supershift BV</Authors>
+    <Company>Supershift BV</Company>
+    <Description>This module sends e-mails using SendGrid by providing it with a Wim.Module.MailTemplate.MailTemplate</Description>
+    <AssemblyVersion>1.0.16.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath></OutputPath>
+    <DocumentationFile>C:\TFS\Mediakiwi\Main\Core\Wim.Module.MailTemplate\Wim.Module.MailTemplate.SendGrid\Wim.Module.MailTemplate.SendGrid.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\tfs_trunk\Mediakiwi\Main\Core\Wim.Module.MailTemplate\Wim.Module.MailTemplate.SendGrid\Wim.Module.MailTemplate.SendGrid.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Sendgrid" Version="9.10.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="4.5.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="6.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wim.Module.MailTemplate\Wim.Module.MailTemplate.csproj" />
+  </ItemGroup>
+
+</Project>
