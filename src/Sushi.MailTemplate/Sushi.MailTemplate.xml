@@ -205,6 +205,7 @@
             Retrieves all MailTemplates that matches the specified identifiers
             </summary>
             <param name="identifiers">Collection of identifiers</param>
+            <param name="onlyPublished"></param>
             <returns></returns>
         </member>
         <member name="M:Sushi.MailTemplate.Data.MailTemplate.Save(System.Int32,System.String,System.String)">

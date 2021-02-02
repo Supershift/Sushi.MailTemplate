@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.Test", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.UI", "Sushi.MailTemplate.UI\Sushi.MailTemplate.UI.csproj", "{BC39BD92-6B65-4594-AF23-340399032C6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.MediaKiwi.UI", "Sushi.MailTemplate.MediaKiwi.UI\Sushi.MailTemplate.MediaKiwi.UI.csproj", "{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.MediaKiwi.Portal", "Sushi.MailTemplate.MediaKiwi.Portal\Sushi.MailTemplate.MediaKiwi.Portal.csproj", "{58F39DF7-20B2-4658-B326-D2425686AAE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{BC39BD92-6B65-4594-AF23-340399032C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC39BD92-6B65-4594-AF23-340399032C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC39BD92-6B65-4594-AF23-340399032C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

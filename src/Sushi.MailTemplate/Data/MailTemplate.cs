@@ -155,6 +155,7 @@ namespace Sushi.MailTemplate.Data
         /// Retrieves all MailTemplates that matches the specified identifiers
         /// </summary>
         /// <param name="identifiers">Collection of identifiers</param>
+        /// <param name="onlyPublished"></param>
         /// <returns></returns>
         public static List<MailTemplate> FetchAllByIdentifiers(IEnumerable<string> identifiers, bool onlyPublished = true)
         {
