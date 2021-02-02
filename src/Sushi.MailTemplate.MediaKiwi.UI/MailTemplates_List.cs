@@ -210,7 +210,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             wim.SetPropertyVisibility(nameof(BtnPublish), !(Implement.IsPublished.HasValue && Implement.IsPublished.Value));
             wim.SetPropertyVisibility(nameof(BtnPreview), !wim.IsEditMode);
             wim.SetPropertyVisibility(nameof(BtnSendTestMail), !wim.IsEditMode);
-            wim.SetPropertyVisibility(nameof(BtnDefaultValues), !wim.IsEditMode);
+            //wim.SetPropertyVisibility(nameof(BtnDefaultValues), !wim.IsEditMode);
+            // not working yet, so invisible
+            wim.SetPropertyVisibility(nameof(BtnDefaultValues), false);
 
             Wim.Data.Standard.Utility.ReflectProperty(Implement, this);
 
