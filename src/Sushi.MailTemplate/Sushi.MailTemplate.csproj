@@ -9,10 +9,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.2.0</Version>
-    <Authors>Supershift BV</Authors>
-    <Company>Supershift BV</Company>
-    <Description>This module create mail templates with placeholder logic that can be used to send with a module like Wim.Module.MailTemplate.SendGrid</Description>
+    <Version>1.0.0-rc</Version>
+    <Authors>Supershift B.V.</Authors>
+    <Company>Supershift B.V.</Company>
+    <Description>This module creates mail templates with placeholder logic.</Description>
+    <Copyright>2019-2021 Supershift B.V.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Supershift/Sushi.MicroOrm</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Supershift/Sushi.MicroOrm</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -47,14 +52,7 @@
 
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove=".tfignore" />
-    <None Remove="packages.config" />
-    <None Remove="Wim.Module.MailTemplate.csproj.vspscc" />
-    <None Remove="Wim.Module.MailTemplate47.csproj.vspscc" />
-  </ItemGroup>
+  </ItemGroup>  
 
   <ItemGroup>
     <Folder Include="Properties\" />

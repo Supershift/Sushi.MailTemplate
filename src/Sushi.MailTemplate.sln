@@ -5,17 +5,13 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate", "Sushi.MailTemplate\Sushi.MailTemplate.csproj", "{D3FE73A9-EE3A-418F-BAC3-538491531A2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.Portal", "Sushi.MailTemplate.Portal\Sushi.MailTemplate.Portal.csproj", "{A6538971-7F28-46EE-A3F2-3105A4B56533}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.SendGrid", "Sushi.MailTemplate.SendGrid\Sushi.MailTemplate.SendGrid.csproj", "{5064271F-424F-4EDE-9BAD-C2FB232DC861}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.Test", "Sushi.MailTemplate.Test\Sushi.MailTemplate.Test.csproj", "{F5CFA48E-CD83-4C47-BD62-509109613F70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.MediaKiwi.UI", "Sushi.MailTemplate.MediaKiwi.UI\Sushi.MailTemplate.MediaKiwi.UI.csproj", "{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.UI", "Sushi.MailTemplate.UI\Sushi.MailTemplate.UI.csproj", "{BC39BD92-6B65-4594-AF23-340399032C6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.MediaKiwi.Portal", "Sushi.MailTemplate.MediaKiwi.Portal\Sushi.MailTemplate.MediaKiwi.Portal.csproj", "{58F39DF7-20B2-4658-B326-D2425686AAE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.MediaKiwi.UI", "Sushi.MailTemplate.MediaKiwi.UI\Sushi.MailTemplate.MediaKiwi.UI.csproj", "{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.MediaKiwi.Portal", "Sushi.MailTemplate.MediaKiwi.Portal\Sushi.MailTemplate.MediaKiwi.Portal.csproj", "{58F39DF7-20B2-4658-B326-D2425686AAE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.Tests", "Sushi.MailTemplate.Tests\Sushi.MailTemplate.Tests.csproj", "{F8204D76-874A-466E-A530-1896E46020B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,22 +23,10 @@ Global
 		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3FE73A9-EE3A-418F-BAC3-538491531A2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6538971-7F28-46EE-A3F2-3105A4B56533}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5064271F-424F-4EDE-9BAD-C2FB232DC861}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5CFA48E-CD83-4C47-BD62-509109613F70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC39BD92-6B65-4594-AF23-340399032C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC39BD92-6B65-4594-AF23-340399032C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC39BD92-6B65-4594-AF23-340399032C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC39BD92-6B65-4594-AF23-340399032C6D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69DBFF07-893E-49E1-B128-A23FB2BFA0B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +35,10 @@ Global
 		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58F39DF7-20B2-4658-B326-D2425686AAE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8204D76-874A-466E-A530-1896E46020B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8204D76-874A-466E-A530-1896E46020B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8204D76-874A-466E-A530-1896E46020B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8204D76-874A-466E-A530-1896E46020B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
