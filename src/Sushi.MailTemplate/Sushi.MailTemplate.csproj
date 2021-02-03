@@ -15,8 +15,8 @@
     <Description>This module creates mail templates with placeholder logic.</Description>
     <Copyright>2019-2021 Supershift B.V.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Supershift/Sushi.MicroOrm</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Supershift/Sushi.MicroOrm</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Supershift/Sushi.MailTemplate</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Supershift/Sushi.MailTemplate</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
