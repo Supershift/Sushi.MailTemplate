@@ -41,7 +41,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         private bool CanSave()
         {
             if (Implement == null) Implement = new Data.MailTemplate();
-            Wim.Data.Standard.Utility.ReflectProperty(this, Implement, true);
+            Utility.ReflectProperty(this, Implement, true);
 
             if (string.IsNullOrWhiteSpace(Implement.Identifier))
             {
@@ -214,7 +214,8 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             // not working yet, so invisible
             wim.SetPropertyVisibility(nameof(BtnDefaultValues), false);
 
-            Wim.Data.Standard.Utility.ReflectProperty(Implement, this);
+
+            Utility.ReflectProperty(Implement, this);
 
             return Task.CompletedTask;
         }

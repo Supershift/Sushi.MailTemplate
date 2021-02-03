@@ -1,30 +1,37 @@
-ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sushi.MailTemplate.SendGrid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Sushi.MailTemplate.SendGrid;
 
-namespace Sushi.MailTemplate.Test
+namespace Sushi.MailTemplate.Tests
 {
     [TestClass]
     public class TestPublic
     {
+        IConfigurationRoot Configuration;
+        
         [TestInitialize]
         public void Init()
         {
-            string defaultConnectionString = Wim.Data.Common.DatabaseConnection;
-
-            Sushi.MicroORM.DatabaseConfiguration.SetDefaultConnectionString(defaultConnectionString);
+            Configuration = new ConfigurationBuilder()                                                          
+                                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                                .AddUserSecrets<TestPublic>()
+                                .AddEnvironmentVariables()
+                                .Build();            
+            
+            MicroORM.DatabaseConfiguration.SetDefaultConnectionString(Configuration.GetConnectionString("Portal"));
         }
 
         [TestMethod]
         public async Task QueueMail()
         {
-            var emailStorageAccount = System.Configuration.ConfigurationManager.AppSettings["EmailStorageAccount"];
-            var emailBlobContainer = System.Configuration.ConfigurationManager.AppSettings["EmailBlobContainer"];
-            var emailQueueName = System.Configuration.ConfigurationManager.AppSettings["EmailQueueName"];
-            var sendGridAPIKey = System.Configuration.ConfigurationManager.AppSettings["SendGridAPIKey"];
+            var emailStorageAccount = Configuration["EmailStorageAccount"];
+            var emailBlobContainer = Configuration["EmailBlobContainer"];
+            var emailQueueName = Configuration["EmailQueueName"];
+            var sendGridAPIKey = Configuration["SendGridAPIKey"];
             var mailer = new Mailer(emailStorageAccount, emailBlobContainer, emailQueueName, sendGridAPIKey);
 
             var mail = new Data.MailTemplate
@@ -57,10 +64,10 @@ namespace Sushi.MailTemplate.Test
                 //var id = "061fadf4-a488-441b-92d8-b25d4a8ad5c1"; // "d5a19359-ff36-41a0-a7ba-ed55e3d68e42"
                 //var id = "d5a19359-ff36-41a0-a7ba-ed55e3d68e42"; 
                 var id = "e2c466db-fb14-4d5a-b131-cf00a6193ffa";
-                var emailStorageAccount = System.Configuration.ConfigurationManager.AppSettings["EmailStorageAccount"];
-                var emailBlobContainer = System.Configuration.ConfigurationManager.AppSettings["EmailBlobContainer"];
-                var emailQueueName = System.Configuration.ConfigurationManager.AppSettings["EmailQueueName"];
-                var sendGridAPIKey = System.Configuration.ConfigurationManager.AppSettings["SendGridAPIKey"];
+                var emailStorageAccount = Configuration["EmailStorageAccount"];
+                var emailBlobContainer = Configuration["EmailBlobContainer"];
+                var emailQueueName = Configuration["EmailQueueName"];
+                var sendGridAPIKey = Configuration["SendGridAPIKey"];
                 var mailer = new Mailer(emailStorageAccount, emailBlobContainer, emailQueueName, sendGridAPIKey);
                 var result = await mailer.SendMailFromBlobAsync(id);
 
@@ -77,10 +84,10 @@ namespace Sushi.MailTemplate.Test
         {
             try
             {
-                var emailStorageAccount = System.Configuration.ConfigurationManager.AppSettings["EmailStorageAccount"];
-                var emailBlobContainer = System.Configuration.ConfigurationManager.AppSettings["EmailBlobContainer"];
-                var emailQueueName = System.Configuration.ConfigurationManager.AppSettings["EmailQueueName"];
-                var sendGridAPIKey = System.Configuration.ConfigurationManager.AppSettings["SendGridAPIKey"];
+                var emailStorageAccount = Configuration["EmailStorageAccount"];
+                var emailBlobContainer = Configuration["EmailBlobContainer"];
+                var emailQueueName = Configuration["EmailQueueName"];
+                var sendGridAPIKey = Configuration["SendGridAPIKey"];
                 var mailer = new Mailer(emailStorageAccount, emailBlobContainer, emailQueueName, sendGridAPIKey);
 
                 var template = MailTemplate.Fetch("TEMPLATEONE");
@@ -276,7 +283,7 @@ namespace Sushi.MailTemplate.Test
                 template.OptionalSections.Add("SUNBED");
                 // add sunbed repeater
                 template.PlaceholderGroupList.Add("SUNBEDS");
-                
+
                 // add new repeater row 
                 template.PlaceholderGroupList.AddNewRow();
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_ROW_COLOR", " background-color:#fef3f4 ");
@@ -285,7 +292,7 @@ namespace Sushi.MailTemplate.Test
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_CAPACITY", "1");
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_POOLPLAN", "Pool one");
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_NUMBER", "05");
-                template.PlaceholderGroupList.AddNewRowItem("SUNBED_PRICE", "- â‚¬ 8,00 ");
+                template.PlaceholderGroupList.AddNewRowItem("SUNBED_PRICE", "- € 8,00 ");
 
                 // add new repeater row 
                 template.PlaceholderGroupList.AddNewRow();
@@ -295,9 +302,9 @@ namespace Sushi.MailTemplate.Test
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_CAPACITY", "1");
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_POOLPLAN", "Pool one");
                 template.PlaceholderGroupList.AddNewRowItem("SUNBED_NUMBER", "01");
-                template.PlaceholderGroupList.AddNewRowItem("SUNBED_PRICE", "â‚¬ 8,00 ");
+                template.PlaceholderGroupList.AddNewRowItem("SUNBED_PRICE", "€ 8,00 ");
 
-              
+
                 // add sunbed section
                 template.OptionalSections.Add("WEBSHOP");
 
@@ -317,7 +324,7 @@ namespace Sushi.MailTemplate.Test
                 template.PlaceholderGroupList.AddNewRowItem("WEBSHOPITEM_PRODUCTNAME", "Spa rood ");
                 template.PlaceholderGroupList.AddNewRowItem("WEBSHOPITEM_CATEGORY", "Producten");
                 template.PlaceholderGroupList.AddNewRowItem("WEBSHOPITEM_PRICE", "Paid");
-              
+
 
 
                 var mail = MailTemplate.ApplyPlaceholders(template, Console.Out);

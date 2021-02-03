@@ -2,11 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>1.0.0-rc</Version>
+    <Authors>Supershift B.V.</Authors>
+    <Company>Supershift B.V.</Company>
+    <Description>Provides UI classes to use Sushi.Mailtemplate in Sushi.MediaKiwi.</Description>
+    <Copyright>2021 Supershift B.V.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Supershift/Sushi.MicroOrm</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Supershift/Sushi.MicroOrm</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Sushi.Mediakiwi" Version="7.15.11" />
-    <PackageReference Include="Wim.Data.Standard" Version="0.1.3" />
   </ItemGroup>
 
   <ItemGroup>
