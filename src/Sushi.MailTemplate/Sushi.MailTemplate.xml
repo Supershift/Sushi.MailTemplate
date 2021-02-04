@@ -254,7 +254,7 @@
             template.PlaceholderGroupList.AddNewRowItem("NAME", "Cus Tomer");
             </summary>
         </member>
-        <member name="F:Sushi.MailTemplate.Data.MailTemplate.OptionalSections">
+        <member name="P:Sushi.MailTemplate.Data.MailTemplate.OptionalSections">
             <summary>
             Optional sections are useful for instance to create invitation mail templates with optional blocks for rooms, sunbeds and express checkins. 
             Leaving a section out has as result that the section is removed from the e-mail.
@@ -467,6 +467,18 @@
             <param name="logger"></param>
             <returns>MailTemplate with Body and Subject replaced</returns>
         </member>
+        <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.ApplyPlaceholders(System.String,System.IO.TextWriter,System.Collections.Generic.List{Sushi.MailTemplate.Entities.PlaceholderGroup},System.Collections.Generic.List{Sushi.MailTemplate.Entities.Placeholder},System.Collections.Generic.List{Sushi.MailTemplate.Data.DefaultValuePlaceholder},System.Collections.Generic.List{System.String})">
+            <summary>
+            Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include.
+            </summary>
+            <param name="textWithPlaceholderTags"></param>
+            <param name="logger"></param>
+            <param name="placeholderGroupReplacements"></param>
+            <param name="placeholderReplacements"></param>
+            <param name="listOfDefaultValues"></param>
+            <param name="optionalSectionsToInclude"></param>
+            <returns></returns>
+        </member>
         <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.ApplyPlaceholdersAsync(Sushi.MailTemplate.Data.MailTemplate,System.Collections.Generic.List{Sushi.MailTemplate.Entities.PlaceholderGroup},System.Collections.Generic.List{Sushi.MailTemplate.Entities.Placeholder},System.Collections.Generic.List{System.String},System.IO.TextWriter)">
             <summary>
             Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include
@@ -496,23 +508,13 @@
             <param name="logger"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.ApplyPlaceholders(System.String,System.IO.TextWriter,System.Collections.Generic.List{Sushi.MailTemplate.Entities.PlaceholderGroup},System.Collections.Generic.List{Sushi.MailTemplate.Entities.Placeholder},System.Collections.Generic.List{Sushi.MailTemplate.Data.DefaultValuePlaceholder},System.Collections.Generic.List{System.String})">
-            <summary>
-            Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include.
-            </summary>
-            <param name="textWithPlaceholderTags"></param>
-            <param name="placeholderGroupReplacements"></param>
-            <param name="placeholderReplacements"></param>
-            <param name="listOfDefaultValues"></param>
-            <param name="optionalSectionsToInclude"></param>
-            <returns></returns>
-        </member>
         <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.GetPlaceholderGroupsWithPlaceholders(System.String,System.Boolean,System.IO.TextWriter)">
             <summary>
             Returns a list of placeholder groups with placeholders
             </summary>
             <param name="textWithPlaceholderTags"></param>
             <param name="mustStripBrackets"></param>
+            <param name="logger"></param>
             <returns></returns>
         </member>
         <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.GetPlaceholderGroups(System.String,System.IO.TextWriter)">
@@ -520,6 +522,7 @@
             Returns a list of placeholder groups, by name only
             </summary>
             <param name="textWithPlaceholderTags"></param>
+            <param name="logger"></param>
             <returns></returns>
         </member>
         <member name="T:Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler">

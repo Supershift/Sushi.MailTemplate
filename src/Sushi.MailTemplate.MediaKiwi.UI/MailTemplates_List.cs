@@ -28,12 +28,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
         private Task MailTemplates_List_ListPreRender(ComponentListEventArgs e)
         {
-            if (wim.IsSaveMode)
+            if (wim.IsSaveMode && !CanSave())
             {
-                if (!CanSave())
-                {
-                    wim.IsSaveMode = false;
-                }
+                wim.IsSaveMode = false;
             }
 
             return Task.CompletedTask;
@@ -96,68 +93,59 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
         private Task MailTemplatesList_ListAction(ComponentActionEventArgs e)
         {
-            if (BtnDeleteSelected)
+            if (BtnDeleteSelected && wim.ChangedSearchGridItem != null)
             {
-                if (wim.ChangedSearchGridItem != null)
+                var mailTemplateIDs = new List<int>();
+
+                foreach (var item in wim.ChangedSearchGridItem)
                 {
-                    var mailTemplateIDs = new List<int>();
-
-                    foreach (var item in wim.ChangedSearchGridItem)
-                    {
-                        var mailTemplate = item as Data.MailTemplateList;
-                        mailTemplateIDs.Add(mailTemplate.ID);
-                    }
-
-                    var isSuccess = Data.MailTemplate.Delete(mailTemplateIDs);
-
-                    if (!isSuccess)
-                    {
-                        wim.Notification.AddError("Failed to delete the selected templates.");
-                    }
-
-                    var keyValues = new List<KeyValue>();
-
-                    Context.Response.Redirect(wim.GetUrl(keyValues.ToArray()));
+                    var mailTemplate = item as Data.MailTemplateList;
+                    mailTemplateIDs.Add(mailTemplate.ID);
                 }
+
+                var isSuccess = Data.MailTemplate.Delete(mailTemplateIDs);
+
+                if (!isSuccess)
+                {
+                    wim.Notification.AddError("Failed to delete the selected templates.");
+                }
+
+                var keyValues = new List<KeyValue>();
+
+                Context.Response.Redirect(wim.GetUrl(keyValues.ToArray()));
             }
 
-            if (BtnPublish)
+            if (BtnPublish && CanSave())
             {
-                if (CanSave())
+                var result = Data.MailTemplateList.FetchSingleByIdentifier(Identifier);
+
+
+                if (result != null && result.ID != Implement.ID)
                 {
-                    var result = Data.MailTemplateList.FetchSingleByIdentifier(Identifier);
-
-
-                    if (result != null && result.ID != Implement.ID)
-                    {
-                        Notification.InsertOne("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
-                        return Task.CompletedTask;
-                    }
-
-                    if (Implement.Publish(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
-                    {
-                        wim.CurrentVisitor.Data.Apply("wim.note", "Template is published");
-                        wim.CurrentVisitor.Save();
-
-                        Response.Redirect(wim.GetUrl(new KeyValue[] {
-                        new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
-                        new KeyValue { Key = "item", Value = Implement.ID }
-                    }));
-                    }
+                    Notification.InsertOne("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
+                    return Task.CompletedTask;
                 }
-            }
 
-            if (BtnRevert)
-            {
-                if (Implement.Revert(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
+                if (Implement.Publish(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
                 {
-                    wim.Notification.AddNotificationAlert($"Template has been reverted to the published version", true);
+                    wim.CurrentVisitor.Data.Apply("wim.note", "Template is published", null);
+                    wim.CurrentVisitor.Save();
 
                     Response.Redirect(wim.GetUrl(new KeyValue[] {
                         new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
                         new KeyValue { Key = "item", Value = Implement.ID }
                     }));
                 }
+            }
+
+            if (BtnRevert && Implement.Revert(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
+            {
+                wim.Notification.AddNotificationAlert($"Template has been reverted to the published version", true);
+
+                Response.Redirect(wim.GetUrl(new KeyValue[] {
+                        new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
+                        new KeyValue { Key = "item", Value = Implement.ID }
+                    }));
             }
 
             return Task.CompletedTask;

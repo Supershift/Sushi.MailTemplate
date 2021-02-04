@@ -12,7 +12,7 @@ namespace Sushi.MailTemplate.Logic
     /// <summary>
     /// PlaceholderLogic class with logic for placeholders
     /// </summary>
-    public class PlaceholderLogic
+    public static class PlaceholderLogic
     {
         // PlaceholderTag = [NAME]
         // PlaceholderReplacer = [PlaceholderTagName, PlaceholderValue]
@@ -69,127 +69,10 @@ namespace Sushi.MailTemplate.Logic
         }
 
         /// <summary>
-        /// Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include
-        /// </summary>
-        /// <param name="mailTemplate"></param>
-        /// <param name="placeholderGroupReplacements"></param>
-        /// <param name="placeholderReplacements"></param>
-        /// <param name="optionalSectionsToInclude"></param>
-        /// <param name="logger"></param>
-        /// <returns>MailTemplate with Body and Subject replaced</returns>
-        public static async Task<Data.MailTemplate> ApplyPlaceholdersAsync(Data.MailTemplate mailTemplate, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsToInclude = null, System.IO.TextWriter logger = null)
-        {
-            var listOfDefaultValues = await Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(mailTemplate.ID);
-
-            mailTemplate.Body = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Body, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
-            mailTemplate.Subject = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Subject, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
-
-            return mailTemplate;
-        }
-
-        /// <summary>
-        /// Get a list of all section tags and specify if the brackets are to be included
-        /// </summary>
-        /// <param name="textWithSectionTags"></param>
-        /// <param name="mustStripBrackets"></param>
-        /// <param name="logger"></param>
-        /// <returns></returns>
-        public static List<string> GetSectionTags(string textWithSectionTags, bool mustStripBrackets = true, System.IO.TextWriter logger = null)
-        {
-            if (string.IsNullOrWhiteSpace(textWithSectionTags))
-            {
-                if (logger != null)
-                    logger.WriteLine("Text with placeholder tags is empty");
-                return new List<string>();
-            }
-
-            var result = textWithSectionTags;
-
-            var reg = new Regex(PatternSection, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            var matches = reg.Matches(textWithSectionTags);
-            var sectionList = new List<string>();
-            if (matches.Count > 0)
-            {
-                foreach (Match match in matches)
-                {
-                    var sectionTag = match.Value;
-
-                    var firstClosingBracket = sectionTag.IndexOf("]");
-                    sectionTag = sectionTag.Substring(0, firstClosingBracket + 1).Replace("section:", string.Empty, StringComparison.OrdinalIgnoreCase);
-
-                    if (mustStripBrackets)
-                    {
-                        var strippedValue = StripBrackets(sectionTag);
-                        sectionTag = strippedValue;
-                    }
-
-                    if (!sectionList.Contains(sectionTag))
-                    {
-                        sectionList.Add(sectionTag);
-                    }
-                }
-            }
-
-            if (logger != null)
-                logger.WriteLine("({0} sections):", sectionList.Count);
-
-            return sectionList;
-
-        }
-
-        /// <summary>
-        /// Get a list of all placeholder tags and specify if the brackets are to be included
-        /// </summary>
-        /// <param name="textWithPlaceholderTags"></param>
-        /// <param name="mustStripBrackets"></param>
-        /// <param name="logger"></param>
-        /// <returns></returns>
-        public static List<string> GetPlaceholderTags(string textWithPlaceholderTags, bool mustStripBrackets = true, System.IO.TextWriter logger = null)
-        {
-            if (string.IsNullOrWhiteSpace(textWithPlaceholderTags))
-            {
-                if (logger != null)
-                    logger.WriteLine("Text with placeholder tags is empty");
-                return new List<string>();
-            }
-
-            var result = textWithPlaceholderTags;
-
-            var reg = new Regex(Pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            var matches = reg.Matches(textWithPlaceholderTags);
-            var placeholderList = new List<string>();
-            if (matches.Count > 0)
-            {
-                foreach (Match match in matches)
-                {
-                    if (Helper.IsPlaceholder(match.Value) && !placeholderList.Contains(match.Value))
-                    {
-                        var placeholderTag = match.Value;
-                        if (mustStripBrackets)
-                        {
-                            var strippedValue = StripBrackets(match.Value);
-                            placeholderTag = strippedValue;
-                        }
-
-                        if (!placeholderList.Contains(placeholderTag))
-                        {
-                            placeholderList.Add(placeholderTag);
-                        }
-                    }
-                }
-            }
-
-            if (logger != null)
-                logger.WriteLine("({0} placeholders):", placeholderList.Count);
-
-            return placeholderList;
-
-        }
-
-        /// <summary>
         /// Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include.
         /// </summary>
         /// <param name="textWithPlaceholderTags"></param>
+        /// <param name="logger"></param>
         /// <param name="placeholderGroupReplacements"></param>
         /// <param name="placeholderReplacements"></param>
         /// <param name="listOfDefaultValues"></param>
@@ -210,7 +93,7 @@ namespace Sushi.MailTemplate.Logic
             var result = textWithPlaceholderTags;
 
             // start with unsubscribe tags to prevent accidental replacement via regex
-            result = ReplaceUnsubscribe(placeholderReplacements, result, logger);
+            result = ReplaceUnsubscribe(result, logger);
 
             #region replace optional sections
             // replace the placeholders with empty strings so normal processing of placeholders can take place
@@ -231,7 +114,7 @@ namespace Sushi.MailTemplate.Logic
             }
             #endregion
 
-            var regGroup = new Regex(PatternGroup, RegexOptions.IgnoreCase | RegexOptions.Singleline);            
+            var regGroup = new Regex(PatternGroup, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             // create a list of repeater placeholders
             var foundGroupTags = regGroup.Matches(result).OfType<Match>().ToList();
 
@@ -256,8 +139,6 @@ namespace Sushi.MailTemplate.Logic
                     // example [g:rooms]<td>Room [ROOMTYPE] for [LASTNAME] </td>[/g:rooms]
                     var replaceBlock = placeholderGroupTag.Value;
 
-                    var placeholderTags = GetPlaceholderTags(placeholderGroupTag.Value, false, logger);
-
                     var replacementList = new List<string>();
 
                     foreach (var placeholderRow in placeholderRows)
@@ -266,11 +147,11 @@ namespace Sushi.MailTemplate.Logic
 
                         foreach (var placeholder in placeholderRow.Placeholders)
                         {
-                            if (replacedRow.IndexOf($"[{placeholder.Name}]") > -1 && !placeholder.Name.Equals("unsubscribe", StringComparison.OrdinalIgnoreCase))
+                            if (replacedRow.IndexOf($"[{placeholder.Name}]", StringComparison.OrdinalIgnoreCase) > -1 && !placeholder.Name.Equals("unsubscribe", StringComparison.OrdinalIgnoreCase))
                             {
                                 if (logger != null)
                                     logger.WriteLine($"replacing {placeholder.Name} with {placeholder.Value}");
-                                replacedRow = replacedRow.Replace($"[{placeholder.Name}]", placeholder.Value);
+                                replacedRow = replacedRow.Replace($"[{placeholder.Name}]", placeholder.Value, StringComparison.OrdinalIgnoreCase);
                             }
 
                         }
@@ -338,10 +219,124 @@ namespace Sushi.MailTemplate.Logic
             var groups = GetPlaceholderGroups(result, logger);
             foreach (var group in groups)
             {
-                result = result.Replace(group, string.Empty);
+                result = result.Replace(group, string.Empty, StringComparison.OrdinalIgnoreCase);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include
+        /// </summary>
+        /// <param name="mailTemplate"></param>
+        /// <param name="placeholderGroupReplacements"></param>
+        /// <param name="placeholderReplacements"></param>
+        /// <param name="optionalSectionsToInclude"></param>
+        /// <param name="logger"></param>
+        /// <returns>MailTemplate with Body and Subject replaced</returns>
+        public static async Task<Data.MailTemplate> ApplyPlaceholdersAsync(Data.MailTemplate mailTemplate, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsToInclude = null, System.IO.TextWriter logger = null)
+        {
+            var listOfDefaultValues = await Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(mailTemplate.ID);
+
+            mailTemplate.Body = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Body, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
+            mailTemplate.Subject = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Subject, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
+
+            return mailTemplate;
+        }
+
+        /// <summary>
+        /// Get a list of all section tags and specify if the brackets are to be included
+        /// </summary>
+        /// <param name="textWithSectionTags"></param>
+        /// <param name="mustStripBrackets"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<string> GetSectionTags(string textWithSectionTags, bool mustStripBrackets = true, System.IO.TextWriter logger = null)
+        {
+            if (string.IsNullOrWhiteSpace(textWithSectionTags))
+            {
+                if (logger != null)
+                    logger.WriteLine("Text with placeholder tags is empty");
+                return new List<string>();
+            }
+
+            var reg = new Regex(PatternSection, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            var matches = reg.Matches(textWithSectionTags);
+            var sectionList = new List<string>();
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    var sectionTag = match.Value;
+
+                    var firstClosingBracket = sectionTag.IndexOf("]");
+                    sectionTag = sectionTag.Substring(0, firstClosingBracket + 1).Replace("section:", string.Empty, StringComparison.OrdinalIgnoreCase);
+
+                    if (mustStripBrackets)
+                    {
+                        var strippedValue = StripBrackets(sectionTag);
+                        sectionTag = strippedValue;
+                    }
+
+                    if (!sectionList.Contains(sectionTag))
+                    {
+                        sectionList.Add(sectionTag);
+                    }
+                }
+            }
+
+            if (logger != null)
+                logger.WriteLine("({0} sections):", sectionList.Count);
+
+            return sectionList;
+
+        }
+
+        /// <summary>
+        /// Get a list of all placeholder tags and specify if the brackets are to be included
+        /// </summary>
+        /// <param name="textWithPlaceholderTags"></param>
+        /// <param name="mustStripBrackets"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<string> GetPlaceholderTags(string textWithPlaceholderTags, bool mustStripBrackets = true, System.IO.TextWriter logger = null)
+        {
+            if (string.IsNullOrWhiteSpace(textWithPlaceholderTags))
+            {
+                if (logger != null)
+                    logger.WriteLine("Text with placeholder tags is empty");
+                return new List<string>();
+            }
+
+            var reg = new Regex(Pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            var matches = reg.Matches(textWithPlaceholderTags);
+            var placeholderList = new List<string>();
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    if (Helper.IsPlaceholder(match.Value) && !placeholderList.Contains(match.Value))
+                    {
+                        var placeholderTag = match.Value;
+                        if (mustStripBrackets)
+                        {
+                            var strippedValue = StripBrackets(match.Value);
+                            placeholderTag = strippedValue;
+                        }
+
+                        if (!placeholderList.Contains(placeholderTag))
+                        {
+                            placeholderList.Add(placeholderTag);
+                        }
+                    }
+                }
+            }
+
+            if (logger != null)
+                logger.WriteLine("({0} placeholders):", placeholderList.Count);
+
+            return placeholderList;
+
         }
 
         /// <summary>
@@ -349,6 +344,7 @@ namespace Sushi.MailTemplate.Logic
         /// </summary>
         /// <param name="textWithPlaceholderTags"></param>
         /// <param name="mustStripBrackets"></param>
+        /// <param name="logger"></param>
         /// <returns></returns>
         public static List<PlaceholderGroup> GetPlaceholderGroupsWithPlaceholders(string textWithPlaceholderTags, bool mustStripBrackets = true, System.IO.TextWriter logger = null)
         {
@@ -363,7 +359,6 @@ namespace Sushi.MailTemplate.Logic
             var matchesGroup = regGroup.Matches(textWithPlaceholderTags);
             var placeholderGroupList = new List<PlaceholderGroup>();
 
-            var placeholderList = new List<string>();
             if (matchesGroup.Count > 0)
             {
                 if (logger != null)
@@ -382,6 +377,7 @@ namespace Sushi.MailTemplate.Logic
         /// Returns a list of placeholder groups, by name only
         /// </summary>
         /// <param name="textWithPlaceholderTags"></param>
+        /// <param name="logger"></param>
         /// <returns></returns>
         public static List<string> GetPlaceholderGroups(string textWithPlaceholderTags, System.IO.TextWriter logger)
         {
@@ -400,14 +396,14 @@ namespace Sushi.MailTemplate.Logic
             return placeholderList;
         }
 
-        private static string ReplaceUnsubscribe(List<Placeholder> placeholders, string result, System.IO.TextWriter logger)
+        private static string ReplaceUnsubscribe(string result, System.IO.TextWriter logger)
         {
             var unsubscribeStart = "[unsubscribe]";
             var unsubscribeEnd = "[/unsubscribe]";
 
 
             // replace placeholder [unsubscribe]here[/unsubscribe] with <a href="[unsubscribe]">here</a> logic
-            if (result.IndexOf(unsubscribeStart, StringComparison.OrdinalIgnoreCase) > 0 && result.IndexOf(unsubscribeEnd, StringComparison.OrdinalIgnoreCase) > 0)
+            if (result.IndexOf(unsubscribeStart, StringComparison.OrdinalIgnoreCase) >= 0 && result.IndexOf(unsubscribeEnd, StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 result = Helper.ReplaceLegacyUnsubscribe(result);
 
