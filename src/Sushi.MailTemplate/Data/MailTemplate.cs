@@ -378,7 +378,7 @@ namespace Sushi.MailTemplate.Data
         /// Optional sections are useful for instance to create invitation mail templates with optional blocks for rooms, sunbeds and express checkins. 
         /// Leaving a section out has as result that the section is removed from the e-mail.
         /// </summary>
-        public List<string> OptionalSections = new List<string>();
+        public List<string> OptionalSections { get; set; } = new List<string>();
     }
     /// <summary>
     /// PlaceholderGroupList class, with methods to add items
