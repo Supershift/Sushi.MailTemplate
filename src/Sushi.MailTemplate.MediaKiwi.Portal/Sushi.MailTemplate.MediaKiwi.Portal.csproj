@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Sushi.Mediakiwi" Version="7.15.11" />
+    <PackageReference Include="Sushi.Mediakiwi" Version="7.15.16" />
   </ItemGroup>
 
   <ItemGroup>
