@@ -57,7 +57,7 @@ private void OnSendPreviewEmail(object sender, Sushi.MailTemplate.Logic.SendPrev
       message.From.Add(new MailboxAddress (mailTemplate.DefaultSenderName, emailFrom));
       message.To.Add(new MailboxAddress (emailTo, emailTo));
       message.Subject = subject;
-      message.Body = body;
+      message.Body = (new BodyBuilder { HtmlBody = body }).ToMessageBody();
 
       // set up the smtp client from MailKit
       using (var client = new SmtpClient()) {
@@ -100,7 +100,7 @@ private async Task OnSendPreviewEmailAsync(object sender, Sushi.MailTemplate.Log
       message.From.Add (new MailboxAddress (mailTemplate.DefaultSenderName, emailFrom));
       message.To.Add (new MailboxAddress (emailTo, emailTo));
       message.Subject = subject;
-      message.Body = body;
+      message.Body = (new BodyBuilder { HtmlBody = body }).ToMessageBody();
 
       // set up the smtp client from MailKit
       using (var client = new SmtpClient()) {
