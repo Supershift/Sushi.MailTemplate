@@ -47,14 +47,10 @@ private void OnSendPreviewEmail(object sender, Sushi.MailTemplate.Logic.SendPrev
       var emailTo = e.EmailTo;
       var subject = e.Subject;
       var body = e.Body;
-      var templateName = e.TemplateName;
-
-      // get the mail template from the database
-      var mailTemplate = Sushi.MailTemplate.MailTemplate.Fetch(templateName);
             
       // create the message to be send
       var message = new MimeMessage();
-      message.From.Add(new MailboxAddress (mailTemplate.DefaultSenderName, emailFrom));
+      message.From.Add(new MailboxAddress (emailFrom, emailFrom));
       message.To.Add(new MailboxAddress (emailTo, emailTo));
       message.Subject = subject;
       message.Body = (new BodyBuilder { HtmlBody = body }).ToMessageBody();
@@ -91,13 +87,10 @@ private async Task OnSendPreviewEmailAsync(object sender, Sushi.MailTemplate.Log
       var subject = e.Subject;
       var body = e.Body;
       var templateName = e.TemplateName;
-      
-      // get the mail template from the database
-      var mailTemplate = await Sushi.MailTemplate.MailTemplate.FetchAsync(templateName);
 
       // create the message to be send
       var message = new MimeMessage();
-      message.From.Add (new MailboxAddress (mailTemplate.DefaultSenderName, emailFrom));
+      message.From.Add (new MailboxAddress (emailFrom, emailFrom));
       message.To.Add (new MailboxAddress (emailTo, emailTo));
       message.Subject = subject;
       message.Body = (new BodyBuilder { HtmlBody = body }).ToMessageBody();
