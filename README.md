@@ -1,18 +1,18 @@
-# Sushi Mail Template - A Module for MediaKiwi to create easy to use mail templates with placeholders
+# Sushi Mail Template - A Module for Mediakiwi to create easy to use mail templates with placeholders
 [![NuGet version (Sushi.MailTemplate)](https://img.shields.io/nuget/v/Sushi.MailTemplate.svg?style=flat-square)](https://www.nuget.org/packages/Sushi.MailTemplate/)
 [![Build status](https://dev.azure.com/supershift/Mediakiwi/_apis/build/status/Sushi.MailTemplate)](https://dev.azure.com/supershift/Mediakiwi/_build/latest?definitionId=106)
 ## Features
-Sushi Mail Template is a NuGet library that allows you to easily create mail templates with placeholders, repeating placeholder groups and sections that can be .
+Sushi Mail Template is a NuGet library that allows you to easily create mail templates with placeholders, repeating placeholder groups and sections that can be turned on or off.
 ## Using Sushi Mail Template - Setup
 ### Installing via NuGet
-The easiest way to install Sushi.MailTemplate is via [NuGet package](https://www.nuget.org/packages/Sushi.MailTemplate) to your MediaKiwi-powered solution.
+The easiest way to install Sushi.MailTemplate is via [NuGet package](https://www.nuget.org/packages/Sushi.MailTemplate) to your Mediakiwi-powered solution.
 
 In Visual Studio's [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console),
 enter the following command:
 
     Install-Package Sushi.MailTemplate
-### MediaKiwi Portal
-Add the following lists to your MediaKiwi portal:
+### Mediakiwi Portal
+Add the following lists to your Mediakiwi portal:
 * MailTemplates_List
 * SendTestMail_List
 * ShowMailPreview_List
