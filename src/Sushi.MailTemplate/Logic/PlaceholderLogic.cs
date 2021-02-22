@@ -60,7 +60,7 @@ namespace Sushi.MailTemplate.Logic
         /// <returns>MailTemplate with Body and Subject replaced</returns>
         public static Data.MailTemplate ApplyPlaceholders(Data.MailTemplate mailTemplate, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsToInclude = null, System.IO.TextWriter logger = null)
         {
-            var listOfDefaultValues = Data.DefaultValuePlaceholder.FetchAllByMailTemplate(mailTemplate.ID);
+            var listOfDefaultValues = Data.DefaultValuePlaceholder.FetchAllByMailTemplate(mailTemplate.Identifier);
 
             mailTemplate.Body = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Body, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
             mailTemplate.Subject = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Subject, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
@@ -236,7 +236,7 @@ namespace Sushi.MailTemplate.Logic
         /// <returns>MailTemplate with Body and Subject replaced</returns>
         public static async Task<Data.MailTemplate> ApplyPlaceholdersAsync(Data.MailTemplate mailTemplate, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsToInclude = null, System.IO.TextWriter logger = null)
         {
-            var listOfDefaultValues = await Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(mailTemplate.ID);
+            var listOfDefaultValues = await Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(mailTemplate.Identifier);
 
             mailTemplate.Body = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Body, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
             mailTemplate.Subject = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Subject, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));

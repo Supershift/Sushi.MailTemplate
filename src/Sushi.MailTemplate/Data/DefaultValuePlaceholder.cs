@@ -88,28 +88,30 @@ namespace Sushi.MailTemplate.Data
             connector.Delete(this);
         }
         /// <summary>
-        /// Fetch all default values by mail template GUID
+        /// Fetch all default values by mail template identifier
         /// </summary>
-        /// <param name="mailTemplateID"></param>
+        /// <param name="mailTemplateIdentifier"></param>
         /// <returns></returns>
-        public static List<DefaultValuePlaceholder> FetchAllByMailTemplate(int mailTemplateID)
+        public static List<DefaultValuePlaceholder> FetchAllByMailTemplate(string mailTemplateIdentifier)
         {
             var connector = new Connector<DefaultValuePlaceholder>();
             var filter = connector.CreateDataFilter();
-            filter.Add(x => x.MailTemplateID, mailTemplateID);
+            filter.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
+            filter.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
 
             return connector.FetchAll(filter);
         }
         /// <summary>
-        /// Fetch all default values by mail template GUID
+        /// Fetch all default values by mail template identifier
         /// </summary>
-        /// <param name="mailTemplateID"></param>
+        /// <param name="mailTemplateIdentifier"></param>
         /// <returns></returns>
-        public static async Task<List<DefaultValuePlaceholder>> FetchAllByMailTemplateAsync(int mailTemplateID)
+        public static async Task<List<DefaultValuePlaceholder>> FetchAllByMailTemplateAsync(string mailTemplateIdentifier)
         {
             var connector = new Connector<DefaultValuePlaceholder>();
             var filter = connector.CreateDataFilter();
-            filter.Add(x => x.MailTemplateID, mailTemplateID);
+            filter.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
+            filter.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
 
             return await connector.FetchAllAsync(filter);
         }
