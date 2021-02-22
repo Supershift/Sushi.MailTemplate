@@ -1,8 +1,7 @@
-﻿using Sushi.Mediakiwi.Framework;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Wim.Framework;
 
-namespace Sushi.MailTemplate.MediaKiwi.UI
+namespace Sushi.MailTemplate.MediaKiwi.UI.MK
 {
     /// <summary>
     /// DefaultValues_List Component List
@@ -14,21 +13,20 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// </summary>
         public DefaultValues_List()
         {
-            // additional styles for border around the ListDataEditConfiguration textbox
-            //wim.Page.Head.AddStyle("/css/mediakiwiStyles.css", true);
-
             wim.OpenInEditMode = true;
             wim.CanContainSingleInstancePerDefinedList = true;
 
+            ListLoad += DefaultValues_List_ListLoad;
             ListSave += DefaultValues_List_ListSave;
+            ListPreRender += DefaultValues_List_ListPreRender;
             ListSearch += DefaultValues_List_ListSearch;
         }
 
-        private Task DefaultValues_List_ListSearch(ComponentListSearchEventArgs e)
+        private void DefaultValues_List_ListSearch(object sender, ComponentListSearchEventArgs e)
         {
             if (!wim.IsSearchListMode)
             {
-                var idQueryString = Request.Query["item"].ToString();
+                var idQueryString = Request.QueryString["item"];
 
                 int.TryParse(idQueryString, out int id);
 
@@ -62,15 +60,17 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 wim.SearchListCanClickThrough = false;
                 wim.ListDataApply(list);
             }
-
-            return Task.CompletedTask;
         }
 
-        private Task DefaultValues_List_ListSave(ComponentListEventArgs e)
+        private void DefaultValues_List_ListPreRender(IComponentListTemplate sender, ComponentListEventArgs e)
+        {
+        }
+
+        private void DefaultValues_List_ListSave(IComponentListTemplate sender, ComponentListEventArgs e)
         {
             if (wim.ChangedSearchGridItem != null)
             {
-                var idQueryString = Request.Query["item"].ToString();
+                var idQueryString = Request.QueryString["item"];
 
                 int.TryParse(idQueryString, out int id);
 
@@ -109,14 +109,17 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     }
                 }
             }
-
-            return Task.CompletedTask;
         }
+
+        private void DefaultValues_List_ListLoad(IComponentListTemplate sender, ComponentListEventArgs e)
+        {
+        }
+
 
         /// <summary>
         /// Explanation of this window
         /// </summary>
-        [Sushi.Mediakiwi.Framework.ContentListItem.TextLine("")]
+        [Wim.Framework.ContentListItem.TextLine("")]
         public string Title
         {
             get
@@ -128,7 +131,7 @@ A default placeholder value will be used when there is no value provided.";
         /// <summary>
         /// DataList with the default values
         /// </summary>
-        [Sushi.Mediakiwi.Framework.ContentListItem.DataList()]
-        public Sushi.Mediakiwi.Data.DataList DefaultValuesList { get; set; }
+        [Wim.Framework.ContentListItem.DataList()]
+        public Wim.Data.DataList DefaultValuesList { get; set; }
     }
 }

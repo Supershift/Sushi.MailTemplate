@@ -63,18 +63,18 @@
             Deletes the current default value
             </summary>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAllByMailTemplate(System.Int32)">
+        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAllByMailTemplate(System.String)">
             <summary>
-            Fetch all default values by mail template GUID
+            Fetch all default values by mail template identifier
             </summary>
-            <param name="mailTemplateID"></param>
+            <param name="mailTemplateIdentifier"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(System.Int32)">
+        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(System.String)">
             <summary>
-            Fetch all default values by mail template GUID
+            Fetch all default values by mail template identifier
             </summary>
-            <param name="mailTemplateID"></param>
+            <param name="mailTemplateIdentifier"></param>
             <returns></returns>
         </member>
         <member name="T:Sushi.MailTemplate.Data.MailTemplate">
