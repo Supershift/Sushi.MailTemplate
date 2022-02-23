@@ -26,16 +26,15 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             ListSave += MailTemplatesList_ListSave;
         }
 
-        private Task MailTemplates_List_ListPreRender(ComponentListEventArgs e)
+        private async Task MailTemplates_List_ListPreRender(ComponentListEventArgs e)
         {
-            if (wim.IsSaveMode && !CanSave())
+            if (wim.IsSaveMode && !await CanSaveAsync())
             {
                 wim.IsSaveMode = false;
             }
-
-            return Task.CompletedTask;
         }
-        private bool CanSave()
+
+        private async Task<bool> CanSaveAsync()
         {
             if (Implement == null) Implement = new Data.MailTemplate();
             Utility.ReflectProperty(this, Implement, true);
@@ -48,7 +47,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             }
 
             //check there are no other templates with the same identifier
-            var otherMailTemplate = Data.MailTemplateList.FetchSingleByIdentifier(Implement.Identifier);
+            var otherMailTemplate = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Implement.Identifier);
 
             if (otherMailTemplate != null && otherMailTemplate.ID != Implement.ID)
             {
@@ -69,29 +68,25 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             return true;
         }
 
-        private Task MailTemplatesList_ListSave(ComponentListEventArgs e)
+        private async Task MailTemplatesList_ListSave(ComponentListEventArgs e)
         {
-
-            var currentTemplateInDatabase = Data.MailTemplateList.FetchSingle(Implement.ID);
-            var result = Data.MailTemplateList.FetchSingleByIdentifier(Identifier);
+            var currentTemplateInDatabase = await Data.MailTemplateList.FetchSingleAsync(Implement.ID);
+            var result = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Identifier);
 
             if (result != null && result.ID != Implement.ID)
             {
-                Notification.InsertOne("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
-                return Task.CompletedTask;
+                await Notification.InsertOneAsync("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
             }
 
-            var id = Implement.Save(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email);
+            var id = await Implement.SaveAsync(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email);
 
             Response.Redirect(wim.GetUrl(new KeyValue[] {
                         new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
                         new KeyValue { Key = "item", Value = id }
             }));
-
-            return Task.CompletedTask;
         }
 
-        private Task MailTemplatesList_ListAction(ComponentActionEventArgs e)
+        private async Task MailTemplatesList_ListAction(ComponentActionEventArgs e)
         {
             if (BtnDeleteSelected && wim.ChangedSearchGridItem != null)
             {
@@ -103,7 +98,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     mailTemplateIDs.Add(mailTemplate.ID);
                 }
 
-                var isSuccess = Data.MailTemplate.Delete(mailTemplateIDs);
+                var isSuccess = await Data.MailTemplate.DeleteAsync(mailTemplateIDs);
 
                 if (!isSuccess)
                 {
@@ -115,21 +110,19 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 Context.Response.Redirect(wim.GetUrl(keyValues.ToArray()));
             }
 
-            if (BtnPublish && CanSave())
+            if (BtnPublish && await CanSaveAsync())
             {
-                var result = Data.MailTemplateList.FetchSingleByIdentifier(Identifier);
-
+                var result = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Identifier);
 
                 if (result != null && result.ID != Implement.ID)
                 {
-                    Notification.InsertOne("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
-                    return Task.CompletedTask;
+                    await Notification.InsertOneAsync("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
                 }
 
-                if (Implement.Publish(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
+                if (await Implement.PublishAsync(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
                 {
                     wim.CurrentVisitor.Data.Apply("wim.note", "Template is published", null);
-                    wim.CurrentVisitor.Save();
+                    await wim.CurrentVisitor.SaveAsync();
 
                     Response.Redirect(wim.GetUrl(new KeyValue[] {
                         new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
@@ -138,7 +131,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 }
             }
 
-            if (BtnRevert && Implement.Revert(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
+            if (BtnRevert && await Implement.RevertAsync(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
             {
                 wim.Notification.AddNotificationAlert($"Template has been reverted to the published version", true);
 
@@ -147,8 +140,6 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                         new KeyValue { Key = "item", Value = Implement.ID }
                     }));
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -162,12 +153,12 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// </summary>
         public Data.MailTemplate Implement { get; set; }
 
-        private Task MailTemplatesList_ListLoad(ComponentListEventArgs e)
+        private async Task MailTemplatesList_ListLoad(ComponentListEventArgs e)
         {
-            Implement = Data.MailTemplate.FetchSingle(e.SelectedKey);
+            Implement = await Data.MailTemplate.FetchSingleAsync(e.SelectedKey);
             if (Implement != null)
             {
-                var latestTemplate = Data.MailTemplateList.FetchSingleByIdentifier(Implement.Identifier);
+                var latestTemplate = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Implement.Identifier);
 
                 if (latestTemplate != null && Implement.ID != latestTemplate.ID)
                 {
@@ -184,7 +175,6 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     ListOfAvailablePlaceholders += string.Join("<br/>", Logic.PlaceholderLogic.GetPlaceholderTags(Implement.Subject));
                     ListOfAvailablePlaceholders += "<br/><br/><b>Body:</b><br/>";
                     ListOfAvailablePlaceholders += string.Join("<br/>", Logic.PlaceholderLogic.GetPlaceholderTags(Implement.Body));
-
                 }
             }
             else
@@ -204,11 +194,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
 
             Utility.ReflectProperty(Implement, this);
-
-            return Task.CompletedTask;
         }
 
-        private Task MailTemplatesList_ListSearch(ComponentListSearchEventArgs e)
+        private async Task MailTemplatesList_ListSearch(ComponentListSearchEventArgs e)
         {
             // Don't need this in the export
             if (!wim.IsExportMode_XLS)
@@ -232,11 +220,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             wim.ListDataColumns.Add(new ListDataColumn("Has published version", nameof(Data.MailTemplate.HasPublishedVersion)));
             wim.ListDataColumns.Add(new ListDataColumn("Is current published", nameof(Data.MailTemplate.IsPublished)));
 
-            var items = Data.MailTemplateList.FetchAll(FilterText);
+            var items = await Data.MailTemplateList.FetchAllAsync(FilterText);
             wim.ListDataAdd(items);
-
-            return Task.CompletedTask;
         }
+
         /// <summary>
         /// Button to open the default values
         /// </summary>
@@ -260,21 +247,25 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     );
             }
         }
+
         /// <summary>
         /// Publish button
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.Button("Publish", IsPrimary = true)]
         public bool BtnPublish { get; set; }
+
         /// <summary>
         /// Revert button
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.Button("Revert", AskConfirmation = true, ConfirmationQuestion = "Are you sure you want to revert to the published version?")]
         public bool BtnRevert { get; set; }
+
         /// <summary>
         /// Preview button
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.Button("Preview e-mail", OpenInPopupLayer = true, CustomUrlProperty = "MessagePreview")]
         public bool BtnPreview { get; set; }
+
         /// <summary>
         /// Send test mail button
         /// </summary>
@@ -285,6 +276,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             , PopupLayerScrollBar = true
             , PopupLayerHeight = "400px")]
         public bool BtnSendTestMail { get; set; }
+
         /// <summary>
         /// Guid to the SendTestMail_List
         /// </summary>
@@ -297,6 +289,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 return list.HasValue ? list.Value.ToString() : string.Empty;
             }
         }
+
         /// <summary>
         /// Url of the message preview dialog
         /// </summary>
@@ -315,6 +308,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     );
             }
         }
+
         /// <summary>
         /// Url of the SendTestMail_List
         /// </summary>
@@ -338,46 +332,55 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// </summary>
         [Mediakiwi.Framework.ContentListSearchItem.TextField("Search", 50)]
         public string FilterText { get; set; }
+
         /// <summary>
         /// Name textbox
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("Name", 50)]
         public string Name { get; set; }
+
         /// <summary>
         /// Description textfield
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("Description", 255, IsRequired = false, Mandatory = false)]
         public string Description { get; set; }
+
         /// <summary>
         /// Identifier textbox
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("Identifier", 50, Mandatory = true, IsRequired = true)]
         public string Identifier { get; set; }
+
         /// <summary>
         /// Default sender e-mail textbox
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("Default sender email", 255)]
         public string DefaultSenderEmail { get; set; }
+
         /// <summary>
         /// Default sender name textbox
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("Default sender name", 50)]
         public string DefaultSenderName { get; set; }
+
         /// <summary>
         /// BCC receivers textbox, ";"-separated string
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("BCC receivers", 4000)]
         public string BCCReceivers { get; set; }
+
         /// <summary>
         /// Subject textbox
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextField("Subject", 512, IsRequired = true, Mandatory = true)]
         public string Subject { get; set; }
+
         /// <summary>
         /// Body textbox
         /// </summary>
         [Mediakiwi.Framework.ContentListItem.TextArea("Body", 0, IsSourceCode = true, Mandatory = true)]
         public string Body { get; set; }
+
         /// <summary>
         /// List of available placeholders
         /// </summary>

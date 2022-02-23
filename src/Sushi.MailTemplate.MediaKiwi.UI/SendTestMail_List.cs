@@ -29,12 +29,12 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             ListPreRender += SendTestMail_List_ListPreRender;
         }
 
-        private Task SendTestMail_List_ListPreRender(ComponentListEventArgs e)
+        private async Task SendTestMail_List_ListPreRender(ComponentListEventArgs e)
         {
             var idQueryString = Request.Query["item"].ToString();
 
             int.TryParse(idQueryString, out int id);
-            var mailTemplate = Data.MailTemplate.FetchSingle(id);
+            var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
             EmailFrom = EmailFrom ?? mailTemplate.DefaultSenderEmail;
             EmailTo = EmailTo ?? wim.CurrentApplicationUser.Email;
 
@@ -42,26 +42,23 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             {
                 wim.Notification.AddError("A subject is mandatory, please supply a subject before sending a test e-mail. E-mail can't be sent.");
             }
-
-            return Task.CompletedTask;
         }
 
-        private Task SendTestMail_List_ListSave(ComponentListEventArgs e)
+        private async Task SendTestMail_List_ListSave(ComponentListEventArgs e)
         {
             var idQueryString = Request.Query["item"].ToString();
 
             int.TryParse(idQueryString, out int id);
-            SendTestMail(id);
-
-            return Task.CompletedTask;
+            await SendTestMailAsync(id);
         }
+
         /// <summary>
         /// Send the current mail template with the provided values to the handler
         /// </summary>
         /// <param name="id"></param>
-        public void SendTestMail(int id)
+        public async Task SendTestMailAsync(int id)
         {
-            var mailTemplate = Data.MailTemplate.FetchSingle(id);
+            var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
 
             var placeholderSubject = CreatePlaceholderObject(mailTemplate.Subject);
             var placeholderBody = CreatePlaceholderObject(mailTemplate.Body);
@@ -70,7 +67,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             var sectionBody = CreateSectionObject(mailTemplate.Body);
 
-            mailTemplate = Logic.PlaceholderLogic.ApplyPlaceholders(mailTemplate, placeholderGroupBody, placeholderBody, sectionBody);
+            mailTemplate = await Logic.PlaceholderLogic.ApplyPlaceholdersAsync(mailTemplate, placeholderGroupBody, placeholderBody, sectionBody);
 
             var body = mailTemplate.Body;
             var subject = mailTemplate.Subject;
@@ -79,34 +76,34 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             {
                 // not possible to send an e-mail without a subject
                 wim.CurrentVisitor.Data.Apply("wim.note", "A subject is mandatory, please supply a subject before sending a test e-mail. E-mail wasn't sent.");
-                wim.CurrentVisitor.Save();
+                await wim.CurrentVisitor.SaveAsync();
                 return;
             }
 
             var e = new Logic.SendPreviewEmailEventArgs { EmailFrom = EmailFrom, EmailTo = EmailTo, Subject = subject, Body = body, TemplateName = mailTemplate.Identifier, EmailFromName = mailTemplate.DefaultSenderName };
             var handler = new Logic.SendPreviewEmailEventHandler();
-            handler.OnSendPreviewEmail(e);
+            await handler.OnSendPreviewEmailAsync(e);
 
             if (e.IsSuccess)
             {
                 // send successfull
                 wim.CurrentVisitor.Data.Apply("wim.note", "E-mail has been sent successfully");
-                wim.CurrentVisitor.Save();
+                await wim.CurrentVisitor.SaveAsync();
             }
             else
             {
                 wim.CurrentVisitor.Data.Apply("wim.note", "E-mail wasn't sent properly");
-                wim.CurrentVisitor.Save();
+                await wim.CurrentVisitor.SaveAsync();
             }
         }
 
-        private Task SendTestMail_List_ListLoad(ComponentListEventArgs e)
+        private async Task SendTestMail_List_ListLoad(ComponentListEventArgs e)
         {
             var idQueryString = Request.Query["item"].ToString();
 
             int.TryParse(idQueryString, out int id);
 
-            var mailTemplate = Data.MailTemplate.FetchSingle(id);
+            var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
 
             var placeholdersSubject = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Subject);
             foreach (var placeholder in placeholdersSubject)
@@ -128,8 +125,6 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 wim.Form.AddElement(this, section, true, true,
                     new Mediakiwi.Framework.ContentListItem.Choice_CheckboxAttribute(section, false));
             }
-
-            return Task.CompletedTask;
         }
 
         private List<Placeholder> CreatePlaceholderObject(string textWithTags)

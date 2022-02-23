@@ -1,6 +1,7 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Queue;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 using SG = SendGrid;
@@ -52,52 +53,34 @@ namespace Sushi.MailTemplate.SendGrid
         /// <param name="emailTo">E-mail address to send to</param>
         /// <param name="customerGUID">Optional customer GUID, which can be set to null</param>
         /// <returns></returns>
-        public bool QueueMail(Data.MailTemplate mail, string emailTo, Guid? customerGUID)
-        {
-            // new guid to use as identifier for blob and queue
-            var id = Guid.NewGuid();
-
-            (CloudBlockBlob blob, CloudQueue queue, string email) = GetBlobQueueAndEmail(mail, emailTo, id, customerGUID);
-
-            // upload to blob
-            blob.UploadText(email);
-
-            // queue message only has id as reference to blob
-            var queueMessage = id.ToString();
-
-            // add queue message
-            queue.AddMessage(new CloudQueueMessage(queueMessage));
-
-            return true;
-        }
-
-        /// <summary>
-        /// QueueMailAsync inserts a queue message and saves the Data.MailTemplate mail in blob storage.
-        /// </summary>
-        /// <param name="mail">Data.MailTemplate with its properties filled</param>
-        /// <param name="emailTo">E-mail address to send to</param>
-        /// <param name="customerGUID">Optional customer GUID, which can be set to null</param>
         public async Task<bool> QueueMailAsync(Data.MailTemplate mail, string emailTo, Guid? customerGUID)
         {
             // new guid to use as identifier for blob and queue
             var id = Guid.NewGuid();
 
-            (CloudBlockBlob blob, CloudQueue queue, string email) = GetBlobQueueAndEmail(mail, emailTo, id, customerGUID);
+            (BlobClient blob, QueueClient queue, string email) = await GetBlobQueueAndEmailAsync(mail, emailTo, id, customerGUID);
 
             // upload to blob
-            await blob.UploadTextAsync(email);
+            using (var ms = new MemoryStream())
+            {
+                StreamWriter writer = new StreamWriter(ms);
+                writer.Write(email);
+                writer.Flush();
+                ms.Position = 0;
+                await blob.UploadAsync(ms);
+            }
 
             // queue message only has id as reference to blob
             var queueMessage = id.ToString();
 
             // add queue message
-            await queue.AddMessageAsync(new CloudQueueMessage(queueMessage));
+            await queue.SendMessageAsync(queueMessage);
 
             return true;
         }
 
 
-        private (CloudBlockBlob blob, CloudQueue queue, string email) GetBlobQueueAndEmail(Data.MailTemplate mail, string emailTo, Guid id, Guid? customerGUID)
+        private async Task<(BlobClient blob, QueueClient queue, string email)> GetBlobQueueAndEmailAsync(Data.MailTemplate mail, string emailTo, Guid id, Guid? customerGUID)
         {
             string emailFromName = mail.DefaultSenderName;
             string emailFrom = mail.DefaultSenderEmail;
@@ -108,8 +91,7 @@ namespace Sushi.MailTemplate.SendGrid
 
             // get blob information
             var blobPersister = new BlobPersister(EmailStorageAccount);
-            var container = blobPersister.GetContainer(EmailBlobContainer);
-            var blob = container.GetBlockBlobReference(id.ToString());
+            var blob = await blobPersister.GetBlockBlobReferenceAsync(EmailBlobContainer, id.ToString());
 
             // create email message to save to blob
             var email = new Email
@@ -212,20 +194,17 @@ namespace Sushi.MailTemplate.SendGrid
             }
 
             // get storage account
-            var storageAccount = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(EmailStorageAccount);
+            var storageAccount = new BlobPersister(EmailStorageAccount);
 
             // get blob information
-            var blobClient = new Microsoft.WindowsAzure.Storage.Blob.CloudBlobClient(storageAccount.BlobEndpoint, storageAccount.Credentials);
-            var container = blobClient.GetContainerReference(EmailBlobContainer);
-            await container.CreateIfNotExistsAsync();
-            var blob = container.GetBlockBlobReference(id.ToString());
+            var blob = await storageAccount.GetBlockBlobReferenceAsync(EmailBlobContainer, id.ToString());
 
             // check if the blob exists
             if (await blob.ExistsAsync())
             {
-                var text = await blob.DownloadTextAsync();
+                var text = await blob.DownloadContentAsync();
 
-                var email = Newtonsoft.Json.JsonConvert.DeserializeObject<Email>(text);
+                var email = Newtonsoft.Json.JsonConvert.DeserializeObject<Email>(text.Value.Content.ToString());
 
                 string emailFrom = email.From;
                 string emailFromName = HttpUtility.HtmlDecode(email.FromName);
@@ -293,7 +272,7 @@ namespace Sushi.MailTemplate.SendGrid
             else
             {
                 // blob doesn't exist
-                throw new Microsoft.WindowsAzure.Storage.StorageException($"Blob {id} not found");
+                throw new ApplicationException($"Blob {id} not found");
             }
         }
     }

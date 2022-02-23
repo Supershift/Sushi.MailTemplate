@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.0-rc3</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <Version>1.1.0</Version>
     <Authors>Supershift B.V.</Authors>
     <Company>Supershift B.V.</Company>
     <Description>Provides UI classes to use Sushi.Mailtemplate in Sushi.MediaKiwi.</Description>
-    <Copyright>2021 Supershift B.V.</Copyright>
+    <Copyright>2022 Supershift B.V.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Supershift/Sushi.MailTemplate</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Supershift/Sushi.MailTemplate</RepositoryUrl>
@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Sushi.Mediakiwi" Version="7.15.16" />
+    <PackageReference Include="Sushi.Mediakiwi" Version="8.1.19" />
   </ItemGroup>
 
   <ItemGroup>

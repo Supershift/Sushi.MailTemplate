@@ -24,7 +24,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             var mailTemplateKey = Context.Request.Query["MailTemplateID"].ToString();
             if (!string.IsNullOrEmpty(mailTemplateKey))
             {
-                var mailTemplate = Data.MailTemplate.FetchSingle(int.Parse(mailTemplateKey));
+                var mailTemplate = await Data.MailTemplate.FetchSingleAsync(int.Parse(mailTemplateKey));
 
                 var body = HttpUtility.HtmlDecode(mailTemplate.Body);
 

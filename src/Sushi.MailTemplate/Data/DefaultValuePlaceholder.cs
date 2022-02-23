@@ -1,6 +1,5 @@
 ﻿using Sushi.MicroORM;
 using Sushi.MicroORM.Mapping;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -48,59 +47,26 @@ namespace Sushi.MailTemplate.Data
         public string Value { get; set; }
 
         /// <summary>
-        /// Fetch all default values
-        /// </summary>
-        /// <returns></returns>
-        public static List<DefaultValuePlaceholder> FetchAll()
-        {
-            var connector = new Connector<DefaultValuePlaceholder>();
-            var filter = connector.CreateDataFilter();
-            var result = connector.FetchAll(filter);
-            return result;
-        }
-        /// <summary>
-        /// Fetch one default value by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public static DefaultValuePlaceholder FetchSingle(int id)
-        {
-            var connector = new Connector<DefaultValuePlaceholder>();
-            var result = connector.FetchSingle(id);
-            return result;
-        }
-        /// <summary>
         /// Saves the current default value
         /// </summary>
         /// <returns></returns>
-        public int Save()
+        public async Task<int> SaveAsync()
         {
             var connector = new Connector<DefaultValuePlaceholder>();
-            connector.Save(this);
-            return this.ID;
+            await connector.SaveAsync(this);
+            return ID;
         }
+
         /// <summary>
         /// Deletes the current default value
         /// </summary>
-        public void Delete()
+        public async Task DeleteAsync()
         {
             var connector = new Connector<DefaultValuePlaceholder>();
-            connector.Delete(this);
+            await connector.DeleteAsync(this);
         }
-        /// <summary>
-        /// Fetch all default values by mail template identifier
-        /// </summary>
-        /// <param name="mailTemplateIdentifier"></param>
-        /// <returns></returns>
-        public static List<DefaultValuePlaceholder> FetchAllByMailTemplate(string mailTemplateIdentifier)
-        {
-            var connector = new Connector<DefaultValuePlaceholder>();
-            var filter = connector.CreateDataFilter();
-            filter.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
-            filter.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
 
-            return connector.FetchAll(filter);
-        }
+   
         /// <summary>
         /// Fetch all default values by mail template identifier
         /// </summary>
@@ -109,7 +75,7 @@ namespace Sushi.MailTemplate.Data
         public static async Task<List<DefaultValuePlaceholder>> FetchAllByMailTemplateAsync(string mailTemplateIdentifier)
         {
             var connector = new Connector<DefaultValuePlaceholder>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
             filter.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
             filter.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
 

@@ -24,7 +24,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             ListSearch += DefaultValues_List_ListSearch;
         }
 
-        private Task DefaultValues_List_ListSearch(ComponentListSearchEventArgs e)
+        private async Task DefaultValues_List_ListSearch(ComponentListSearchEventArgs e)
         {
             if (!wim.IsSearchListMode)
             {
@@ -32,9 +32,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
                 int.TryParse(idQueryString, out int id);
 
-                var mailTemplate = Data.MailTemplate.FetchSingle(id);
+                var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
 
-                var list = Data.DefaultValuePlaceholder.FetchAllByMailTemplate(mailTemplate.Identifier);
+                var list = await Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(mailTemplate.Identifier);
 
                 var subjectPlaceholders = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Subject);
                 var bodyPlaceholders = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Body);
@@ -59,14 +59,13 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                         Width = 580
                     },
                 });
-                wim.SearchListCanClickThrough = false;
-                wim.ListDataApply(list);
-            }
 
-            return Task.CompletedTask;
+                wim.SearchListCanClickThrough = false;
+                wim.ListDataAdd(list);
+            }
         }
 
-        private Task DefaultValues_List_ListSave(ComponentListEventArgs e)
+        private async Task DefaultValues_List_ListSave(ComponentListEventArgs e)
         {
             if (wim.ChangedSearchGridItem != null)
             {
@@ -85,32 +84,30 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                         {
                             if (mailTemplate == null)
                             {
-                                mailTemplate = Data.MailTemplate.FetchSingle(id);
+                                mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
                             }
 
                             // create
                             defaultValue.ID = 0;
                             defaultValue.MailTemplateID = mailTemplate.ID;
-                            defaultValue.Save();
+                            await defaultValue.SaveAsync();
                         }
                         else
                         {
                             if (string.IsNullOrEmpty(defaultValue.Value))
                             {
                                 // delete
-                                defaultValue.Delete();
+                                await defaultValue.DeleteAsync();
                             }
                             else
                             {
                                 // edit
-                                defaultValue.Save();
+                                await defaultValue.SaveAsync();
                             }
                         }
                     }
                 }
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -125,10 +122,11 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 A default placeholder value will be used when there is no value provided.";
             }
         }
+
         /// <summary>
         /// DataList with the default values
         /// </summary>
-        [Sushi.Mediakiwi.Framework.ContentListItem.DataList()]
-        public Sushi.Mediakiwi.Data.DataList DefaultValuesList { get; set; }
+        [Mediakiwi.Framework.ContentListItem.DataList()]
+        public Mediakiwi.Data.DataList DefaultValuesList { get; set; }
     }
 }

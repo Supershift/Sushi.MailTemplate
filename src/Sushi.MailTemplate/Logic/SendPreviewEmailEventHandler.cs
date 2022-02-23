@@ -9,22 +9,12 @@ namespace Sushi.MailTemplate.Logic
     /// </summary>
     public class SendPreviewEmailEventHandler
     {
-        /// <summary>
-        /// Sync version of the SendPreviewEmail method
-        /// </summary>
-        public static event Action<object, SendPreviewEmailEventArgs> SendPreviewEmail;
+
         /// <summary>
         /// Async version of the SendPreviewEmailAsync method
         /// </summary>
         public static event Func<object, SendPreviewEmailEventArgs, Task> SendPreviewEmailAsync;
-        /// <summary>
-        /// Invokation of the handler
-        /// </summary>
-        /// <param name="e"></param>
-        public virtual void OnSendPreviewEmail(SendPreviewEmailEventArgs e)
-        {
-            SendPreviewEmail?.Invoke(this, e);
-        }
+
         /// <summary>
         /// Async invokation of the SendPreviewEmailAsync
         /// </summary>
@@ -40,6 +30,7 @@ namespace Sushi.MailTemplate.Logic
             }
         }
     }
+
     /// <summary>
     /// SendPreviewEmailEventArgs class
     /// </summary>

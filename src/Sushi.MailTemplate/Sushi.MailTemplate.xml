@@ -39,36 +39,16 @@
             Value of the current default value
             </summary>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAll">
-            <summary>
-            Fetch all default values
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchSingle(System.Int32)">
-            <summary>
-            Fetch one default value by id
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.Save">
+        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.SaveAsync">
             <summary>
             Saves the current default value
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.Delete">
+        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.DeleteAsync">
             <summary>
             Deletes the current default value
             </summary>
-        </member>
-        <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAllByMailTemplate(System.String)">
-            <summary>
-            Fetch all default values by mail template identifier
-            </summary>
-            <param name="mailTemplateIdentifier"></param>
-            <returns></returns>
         </member>
         <member name="M:Sushi.MailTemplate.Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(System.String)">
             <summary>
@@ -187,20 +167,14 @@
             HasPublishedVersion property is true if the mail template has at least one major version
             </summary>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.FetchAll">
-            <summary>
-            Fetch all mail templates
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.FetchSingle(System.Int32)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.FetchSingleAsync(System.Int32)">
             <summary>
             Fetch a single mail template by id
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.FetchAllByIdentifiers(System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.FetchAllByIdentifiersAsync(System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
             <summary>
             Retrieves all MailTemplates that matches the specified identifiers
             </summary>
@@ -208,7 +182,16 @@
             <param name="onlyPublished"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.Save(System.Int32,System.String,System.String)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.FetchSingleByIdentifierAsync(System.String,System.Boolean)">
+            <summary>
+            Returns a single Mailtemplate, based on the supplied Identifier.
+            The latest version will be returned in case there are multiple
+            </summary>
+            <param name="identifier">The mailtemplate identifier</param>
+            <param name="onlyPublished">Only include published mailtemplates</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.SaveAsync(System.Int32,System.String,System.String)">
             <summary>
             Saves the current mail template to the database with checks on the validity of placeholders in the body and subject.
             </summary>
@@ -217,7 +200,7 @@
             <param name="userEmail"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.Revert(System.Int32,System.String,System.String)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.RevertAsync(System.Int32,System.String,System.String)">
             <summary>
             Revert the current mail template to the previous major version.
             </summary>
@@ -226,7 +209,7 @@
             <param name="userEmail"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.Publish(System.Int32,System.String,System.String)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.PublishAsync(System.Int32,System.String,System.String)">
             <summary>
             Publishes the current mail template by making it a major version.
             </summary>
@@ -235,7 +218,7 @@
             <param name="userEmail"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplate.Delete(System.Collections.Generic.List{System.Int32})">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplate.DeleteAsync(System.Collections.Generic.List{System.Int32})">
             <summary>
             Deletes mail templates that are identified by their id.
             </summary>
@@ -315,21 +298,21 @@
             Sequence number in the view
             </summary>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplateList.FetchAll(System.String)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplateList.FetchAllAsync(System.String)">
             <summary>
             Fetch all mail templates
             </summary>
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplateList.FetchSingleByIdentifier(System.String)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplateList.FetchSingleByIdentifierAsync(System.String)">
             <summary>
             Fetch one mail template by identifier
             </summary>
             <param name="identifier"></param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.Data.MailTemplateList.FetchSingle(System.Int32)">
+        <member name="M:Sushi.MailTemplate.Data.MailTemplateList.FetchSingleAsync(System.Int32)">
             <summary>
             Fetch one mail template by id
             </summary>
@@ -445,7 +428,7 @@
             Matches [T], [TEST123]
             </summary>
         </member>
-        <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.ApplyPlaceholders(System.String,System.Collections.Generic.List{Sushi.MailTemplate.Entities.PlaceholderGroup},System.Collections.Generic.List{Sushi.MailTemplate.Entities.Placeholder},System.Collections.Generic.List{System.String},System.IO.TextWriter)">
+        <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.ApplyPlaceholdersAsync(System.String,System.Collections.Generic.List{Sushi.MailTemplate.Entities.PlaceholderGroup},System.Collections.Generic.List{Sushi.MailTemplate.Entities.Placeholder},System.Collections.Generic.List{System.String},System.IO.TextWriter)">
             <summary>
             Provide a mail template ID, placeholder group replacements, placeholder replacements and optional sections to include
             </summary>
@@ -453,17 +436,6 @@
             <param name="placeholderGroupReplacements"></param>
             <param name="placeholderReplacements"></param>
             <param name="optionalSectionsReplacements"></param>
-            <param name="logger"></param>
-            <returns>MailTemplate with Body and Subject replaced</returns>
-        </member>
-        <member name="M:Sushi.MailTemplate.Logic.PlaceholderLogic.ApplyPlaceholders(Sushi.MailTemplate.Data.MailTemplate,System.Collections.Generic.List{Sushi.MailTemplate.Entities.PlaceholderGroup},System.Collections.Generic.List{Sushi.MailTemplate.Entities.Placeholder},System.Collections.Generic.List{System.String},System.IO.TextWriter)">
-            <summary>
-            Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include
-            </summary>
-            <param name="mailTemplate"></param>
-            <param name="placeholderGroupReplacements"></param>
-            <param name="placeholderReplacements"></param>
-            <param name="optionalSectionsToInclude"></param>
             <param name="logger"></param>
             <returns>MailTemplate with Body and Subject replaced</returns>
         </member>
@@ -531,21 +503,10 @@
             Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler.SendPreviewEmail += OnSendPreviewEmail;
             </summary>
         </member>
-        <member name="E:Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler.SendPreviewEmail">
-            <summary>
-            Sync version of the SendPreviewEmail method
-            </summary>
-        </member>
         <member name="E:Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler.SendPreviewEmailAsync">
             <summary>
             Async version of the SendPreviewEmailAsync method
             </summary>
-        </member>
-        <member name="M:Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler.OnSendPreviewEmail(Sushi.MailTemplate.Logic.SendPreviewEmailEventArgs)">
-            <summary>
-            Invokation of the handler
-            </summary>
-            <param name="e"></param>
         </member>
         <member name="M:Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler.OnSendPreviewEmailAsync(Sushi.MailTemplate.Logic.SendPreviewEmailEventArgs)">
             <summary>
@@ -599,26 +560,19 @@
             Use this class as helper to get mail templates and to apply placeholders
             </summary>
         </member>
-        <member name="M:Sushi.MailTemplate.MailTemplate.Fetch(System.String)">
-            <summary>
-            Gets a mail template by identifier
-            </summary>
-            <param name="identifier"></param>
-            <returns></returns>
-        </member>
         <member name="M:Sushi.MailTemplate.MailTemplate.FetchAsync(System.String)">
             <summary>
-            Gets a mail template by identifier
+            Gets a published mail template by its identifier
             </summary>
-            <param name="identifier"></param>
+            <param name="identifier">The Mailtemplate identifier</param>
             <returns></returns>
         </member>
-        <member name="M:Sushi.MailTemplate.MailTemplate.ApplyPlaceholders(Sushi.MailTemplate.Data.MailTemplate,System.IO.TextWriter)">
+        <member name="M:Sushi.MailTemplate.MailTemplate.FetchAsync(System.String,System.Boolean)">
             <summary>
-            Applies the placeholders to the body and the subject properties
+            Gets a mail template by its identifier
             </summary>
-            <param name="mailTemplate"></param>
-            <param name="logger"></param>
+            <param name="identifier">The Mailtemplate identifier</param>
+            <param name="onlyPublished">Should we only return published mailtemplates</param>
             <returns></returns>
         </member>
         <member name="M:Sushi.MailTemplate.MailTemplate.ApplyPlaceholdersAsync(Sushi.MailTemplate.Data.MailTemplate,System.IO.TextWriter)">
