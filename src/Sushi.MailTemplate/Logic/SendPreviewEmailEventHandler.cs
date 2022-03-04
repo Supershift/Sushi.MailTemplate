@@ -40,29 +40,41 @@ namespace Sushi.MailTemplate.Logic
         /// E-mail address to send from
         /// </summary>
         public string EmailFrom { get; set; }
+
         /// <summary>
         /// Name to send from
         /// </summary>
         public string EmailFromName { get; set; }
+
         /// <summary>
         /// E-mail address to send to
         /// </summary>
         public string EmailTo { get; set; }
+
         /// <summary>
         /// Subject of the e-mail
         /// </summary>
         public string Subject { get; set; }
+
         /// <summary>
         /// Body of the e-mail
         /// </summary>
         public string Body { get; set; }
+
         /// <summary>
         /// Template name, as identifier
         /// </summary>
         public string TemplateName { get; set; }
+
         /// <summary>
         /// Shows if sending the preview was successful
         /// </summary>
         public bool IsSuccess { get; set; }
+
+        /// <summary>
+        /// Contains the error message when sending was not successful
+        /// </summary>
+        public string ErrorMessage { get; set; }
+
     }
 }

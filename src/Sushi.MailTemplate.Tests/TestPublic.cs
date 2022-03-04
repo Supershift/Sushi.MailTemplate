@@ -12,9 +12,17 @@ namespace Sushi.MailTemplate.Tests
     public class TestPublic
     {
         IConfigurationRoot Configuration;
+
+        private static string TEST_SENDER_EMAIL = "[YOUR_TEST_EMAIL_ADDRESS]";
+        private static string TEST_SENDER_NAME = "[YOUR_TEST_NAME]";
+        private static string TEST_RECEIVER_EMAIL = "[YOUR_TEST_EMAIL_ADDRESS]";
+        private static string TEST_USER_NAME = "[YOUR_TEST_NAME]";
+        private static string TEST_USER_EMAIL = "[YOUR_TEST_EMAIL_ADDRESS]";
         private static string TEST_TEMPLATE_ID = "INTERNAL-TEST";
         private static string TEST_TEMPLATE_ID_GROUPS = "INTERNAL-TEST-GROUPS";
         private static string TEST_TEMPLATE_ID_SECTIONS = "INTERNAL-TEST-SECTIONS";
+        private static string TEST_QUEUED_MAIL_ID = "[YOUR_QUEUED_EMAIL_IDENTIFIER]";
+
         private static string[] TEST_TEMPLATES = new string[] 
         { 
             TEST_TEMPLATE_ID, 
@@ -45,14 +53,14 @@ namespace Sushi.MailTemplate.Tests
 
             var mail = new Data.MailTemplate
             {
-                DefaultSenderEmail = "mark.rienstra@supershift.nl",
-                DefaultSenderName = "mark Rienstra",
+                DefaultSenderEmail = TEST_SENDER_EMAIL,
+                DefaultSenderName = TEST_SENDER_NAME,
                 Subject = "Test",
                 Body = "body",
                 Identifier = TEST_TEMPLATE_ID
             };
 
-            var result = await mailer.QueueMailAsync(mail, emailTo: "mark.rienstra@supershift.nl", customerGUID: null);
+            var result = await mailer.QueueMailAsync(mail, emailTo: TEST_RECEIVER_EMAIL, customerGUID: null);
 
             Assert.IsTrue(result);
         }
@@ -65,8 +73,8 @@ namespace Sushi.MailTemplate.Tests
                 var mailTemplate = await MailTemplate.FetchAsync(item, false);
                 if (mailTemplate?.ID > 0)
                 {
-                    await mailTemplate.SaveAsync(mailTemplate.UserID.Value, "Mark Rienstra", "mark.rienstra@supershift.nl");
-                    await mailTemplate.PublishAsync(mailTemplate.UserID.Value, "Mark Rienstra", "mark.rienstra@supershift.nl");
+                    await mailTemplate.SaveAsync(mailTemplate.UserID.Value, TEST_USER_NAME, TEST_USER_EMAIL);
+                    await mailTemplate.PublishAsync(mailTemplate.UserID.Value, TEST_USER_NAME, TEST_USER_EMAIL);
                 }
                 else 
                 {
@@ -81,9 +89,7 @@ namespace Sushi.MailTemplate.Tests
         {
             try
             {
-                //var id = "061fadf4-a488-441b-92d8-b25d4a8ad5c1"; // "d5a19359-ff36-41a0-a7ba-ed55e3d68e42"
-                //var id = "d5a19359-ff36-41a0-a7ba-ed55e3d68e42"; 
-                var id = "838c5c11-c66c-46ff-99c5-435d66f3e474";
+                var id = TEST_QUEUED_MAIL_ID;
                 var emailStorageAccount = Configuration["EmailStorageAccount"];
                 var emailBlobContainer = Configuration["EmailBlobContainer"];
                 var emailQueueName = Configuration["EmailQueueName"];
@@ -134,7 +140,7 @@ namespace Sushi.MailTemplate.Tests
                     Body = template.Body,
                     From = template.DefaultSenderEmail,
                     FromName = template.DefaultSenderName,
-                    To = "mark.rienstra@supershift.nl",
+                    To = TEST_RECEIVER_EMAIL,
                     ID = Guid.NewGuid(),
                     TemplateName = template.Identifier,
                     Subject = template.Subject

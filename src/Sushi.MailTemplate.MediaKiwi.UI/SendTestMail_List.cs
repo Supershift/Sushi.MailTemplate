@@ -92,7 +92,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             }
             else
             {
-                wim.CurrentVisitor.Data.Apply("wim.note", "E-mail wasn't sent properly");
+                wim.CurrentVisitor.Data.Apply("wim.note", $"E-mail wasn't sent properly, see '{nameof(SendTestMail_List)}' notifications for more details");
+                
+                await Mediakiwi.Data.Notification.InsertOneAsync(nameof(SendTestMail_List), e.ErrorMessage);
                 await wim.CurrentVisitor.SaveAsync();
             }
         }

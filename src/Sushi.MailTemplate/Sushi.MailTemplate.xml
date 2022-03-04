@@ -555,6 +555,11 @@
             Shows if sending the preview was successful
             </summary>
         </member>
+        <member name="P:Sushi.MailTemplate.Logic.SendPreviewEmailEventArgs.ErrorMessage">
+            <summary>
+            Contains the error message when sending was not successful
+            </summary>
+        </member>
         <member name="T:Sushi.MailTemplate.MailTemplate">
             <summary>
             Use this class as helper to get mail templates and to apply placeholders

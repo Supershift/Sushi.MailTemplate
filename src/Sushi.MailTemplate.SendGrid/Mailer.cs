@@ -31,6 +31,39 @@ namespace Sushi.MailTemplate.SendGrid
             EmailBlobContainer = emailBlobContainer;
             EmailQueueName = emailQueueName;
             SendGridAPIKey = sendGridAPIKey;
+
+            Logic.SendPreviewEmailEventHandler.SendPreviewEmailAsync += SendPreviewEmailEventHandler_SendPreviewEmailAsync;
+        }
+
+        private async Task SendPreviewEmailEventHandler_SendPreviewEmailAsync(object sender, Logic.SendPreviewEmailEventArgs e)
+        {
+            try
+            {
+                var emailFrom = e.EmailFrom;
+                var emailTo = e.EmailTo;
+                var subject = e.Subject;
+                var body = e.Body;
+                var templateName = e.TemplateName;
+
+                var mailTemplate = await MailTemplate.FetchAsync(templateName);
+
+                var emailToSend = new Email
+                {
+                    From = emailFrom,
+                    FromName = mailTemplate.DefaultSenderName,
+                    TemplateName = templateName,
+                    Body = body,
+                    Subject = subject,
+                    To = emailTo
+                };
+
+                e.IsSuccess = await SendMailAsync(emailToSend);
+            }
+            catch (Exception ex)
+            {
+                e.ErrorMessage = ex.Message;
+                e.IsSuccess = false;
+            }
         }
 
         /// <summary>
