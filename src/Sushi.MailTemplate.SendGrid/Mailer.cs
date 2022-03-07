@@ -227,7 +227,8 @@ namespace Sushi.MailTemplate.SendGrid
             }
 
             // get storage account
-            var storageAccount = new BlobPersister(EmailStorageAccount);
+            // get blob persister
+            var blobPersister = new BlobPersister(EmailStorageAccount);
 
             // get blob information
             var blob = await storageAccount.GetBlockBlobReferenceAsync(EmailBlobContainer, id.ToString());
