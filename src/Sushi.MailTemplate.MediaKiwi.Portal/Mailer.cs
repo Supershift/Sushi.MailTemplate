@@ -29,7 +29,7 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
         /// <param name="mail"></param>
         /// <param name="emailTo"></param>
         /// <returns></returns>
-        public async Task<bool> SendMailToQueue(Data.MailTemplate mail, string emailTo, Guid? customerGuid)
+        public async Task<bool> SendMailToQueueAsync(Data.MailTemplate mail, string emailTo, Guid? customerGuid)
         {
             var mailer = new SendGrid.Mailer(EmailStorageAccount, EmailBlobContainer, EmailQueueName, SendGridAPIKey);
             var result = await mailer.QueueMailAsync(mail, emailTo, customerGuid);

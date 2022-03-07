@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Queues;
+using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.SendGrid
 {
@@ -12,9 +13,12 @@ namespace Sushi.MailTemplate.SendGrid
         public string ConnectionString { get; protected set; }
 
 
-        public QueueClient GetQueue(string name)
+        public async Task<QueueClient> GetQueueAsync(string name)
         {
-            return new QueueClient(ConnectionString, name);
+            var queue = new QueueClient(ConnectionString, name);
+            await queue.CreateIfNotExistsAsync();
+
+            return queue;
         }
     }
 }

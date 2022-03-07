@@ -143,7 +143,7 @@ namespace Sushi.MailTemplate.SendGrid
 
             // create queue information
             var queuePersister = new QueuePersister(EmailStorageAccount);
-            var queue = queuePersister.GetQueue(EmailQueueName);
+            var queue = await queuePersister.GetQueueAsync(EmailQueueName);
 
             return (blob, queue, jsonEmail);
         }
