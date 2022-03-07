@@ -1,6 +1,7 @@
 ﻿using Sushi.MicroORM;
 using Sushi.MicroORM.Mapping;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.Data
 {
@@ -53,10 +54,10 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static List<MailTemplateList> FetchAll(string name = "")
+        public static async Task<List<MailTemplateList>> FetchAllAsync(string name = "")
         {
             var connector = new Connector<MailTemplateList>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
 
             filter.AddOrder(x => x.Name);
 
@@ -67,34 +68,37 @@ namespace Sushi.MailTemplate.Data
                 filter.AddParameter("@searchLike", System.Data.SqlDbType.NVarChar, searchLike);
             }
 
-            var result = connector.FetchAll(filter);
+            var result = await connector.FetchAllAsync(filter);
 
             return result;
         }
+    
         /// <summary>
         /// Fetch one mail template by identifier
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public static new MailTemplateList FetchSingleByIdentifier(string identifier)
+        public static async new Task<MailTemplateList> FetchSingleByIdentifierAsync(string identifier)
         {
             var connector = new Connector<MailTemplateList>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
             filter.Add(x => x.Identifier, identifier, ComparisonOperator.Like);
-            var result = connector.FetchSingle(filter);
+            var result = await connector.FetchSingleAsync(filter);
             return result;
         }
+
         /// <summary>
         /// Fetch one mail template by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static new MailTemplateList FetchSingle(int id)
+        public static async new Task<MailTemplateList> FetchSingleAsync(int id)
         {
             var connector = new Connector<MailTemplateList>();
-            var result = connector.FetchSingle(id);
+            var result = await connector.FetchSingleAsync(id);
             return result;
         }
+
         /// <summary>
         /// Internal property for Mediakiwi to see if the record is selected
         /// </summary>

@@ -128,26 +128,16 @@ namespace Sushi.MailTemplate.Data
                 return VersionMajor > 0;
             }
         }
-        /// <summary>
-        /// Fetch all mail templates
-        /// </summary>
-        /// <returns></returns>
-        public static List<MailTemplate> FetchAll()
-        {
-            var connector = new Connector<MailTemplate>();
-            var filter = connector.CreateDataFilter();
-            var result = connector.FetchAll(filter);
-            return result;
-        }
+
         /// <summary>
         /// Fetch a single mail template by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static MailTemplate FetchSingle(int id)
+        public static async Task<MailTemplate> FetchSingleAsync(int id)
         {
             var connector = new Connector<MailTemplate>();
-            var result = connector.FetchSingle(id);
+            var result = await connector.FetchSingleAsync(id);
             return result;
         }
 
@@ -157,58 +147,61 @@ namespace Sushi.MailTemplate.Data
         /// <param name="identifiers">Collection of identifiers</param>
         /// <param name="onlyPublished"></param>
         /// <returns></returns>
-        public static List<MailTemplate> FetchAllByIdentifiers(IEnumerable<string> identifiers, bool onlyPublished = true)
+        public static async Task<List<MailTemplate>> FetchAllByIdentifiersAsync(IEnumerable<string> identifiers, bool onlyPublished = true)
         {
             var connector = new Connector<MailTemplate>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
             filter.Add(x => x.Identifier, identifiers, ComparisonOperator.In);
 
             if (onlyPublished)
                 filter.Add(x => x.IsPublished, onlyPublished);
 
-            var result = connector.FetchAll(filter);
+            var result = await connector.FetchAllAsync(filter);
             return result;
         }
 
-        internal static MailTemplate FetchSingle(string identifier, int versionMajor)
+        internal static async Task<MailTemplate> FetchSingleAsync(string identifier, int versionMajor)
         {
             var connector = new Connector<MailTemplate>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
             filter.Add(x => x.VersionMajor, versionMajor);
             filter.Add(x => x.Identifier, identifier);
-            var result = connector.FetchSingle(filter);
+            var result = await connector.FetchSingleAsync(filter);
             return result;
         }
-        internal static MailTemplate FetchSingleByIdentifier(string identifier)
+
+        /// <summary>
+        /// Returns a single Mailtemplate, based on the supplied Identifier.
+        /// The latest version will be returned in case there are multiple
+        /// </summary>
+        /// <param name="identifier">The mailtemplate identifier</param>
+        /// <param name="onlyPublished">Only include published mailtemplates</param>
+        /// <returns></returns>
+        internal static async Task<MailTemplate> FetchSingleByIdentifierAsync(string identifier, bool onlyPublished)
         {
             var connector = new Connector<MailTemplate>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
             filter.Add(x => x.Identifier, identifier);
-            filter.Add(x => x.IsPublished, true);
-            filter.Add(x => x.VersionMinor, 0);
-            filter.AddOrder(x => x.VersionMajor, SortOrder.DESC);
-            var result = connector.FetchSingle(filter);
-            return result;
-        }
-        internal static async Task<MailTemplate> FetchSingleByIdentifierAsync(string identifier)
-        {
-            var connector = new Connector<MailTemplate>();
-            var filter = connector.CreateDataFilter();
-            filter.Add(x => x.Identifier, identifier);
-            filter.Add(x => x.IsPublished, true);
-            filter.Add(x => x.VersionMinor, 0);
+            if (onlyPublished)
+            {
+                filter.Add(x => x.IsPublished, true);
+                filter.Add(x => x.VersionMinor, 0);
+            }
+            
             filter.AddOrder(x => x.VersionMajor, SortOrder.DESC);
             var result = await connector.FetchSingleAsync(filter);
             return result;
         }
-        internal static List<MailTemplate> FetchAllByIdentifier(string identifier)
+
+        internal static async Task<List<MailTemplate>> FetchAllByIdentifierAsync(string identifier)
         {
             var connector = new Connector<MailTemplate>();
-            var filter = connector.CreateDataFilter();
+            var filter = connector.CreateQuery();
             filter.Add(x => x.Identifier, identifier);
-            var result = connector.FetchAll(filter);
+            var result = await connector.FetchAllAsync(filter);
             return result;
         }
+
         /// <summary>
         /// Saves the current mail template to the database with checks on the validity of placeholders in the body and subject.
         /// </summary>
@@ -216,7 +209,7 @@ namespace Sushi.MailTemplate.Data
         /// <param name="userDisplayname"></param>
         /// <param name="userEmail"></param>
         /// <returns></returns>
-        public int Save(int userID, string userDisplayname, string userEmail)
+        public async Task<int> SaveAsync(int userID, string userDisplayname, string userEmail)
         {
             if (Logic.Helper.IsValidTemplate(Body, Subject))
             {
@@ -224,8 +217,8 @@ namespace Sushi.MailTemplate.Data
                 Subject = Logic.Helper.ReplaceLegacyUnsubscribe(Subject);
 
                 var connector = new Connector<MailTemplate>();
-                var currentTemplateInDatabase = MailTemplateList.FetchSingle(ID);
-                var result = MailTemplateList.FetchSingleByIdentifier(Identifier);
+                var currentTemplateInDatabase = await MailTemplateList.FetchSingleAsync(ID);
+                var result = await MailTemplateList.FetchSingleByIdentifierAsync(Identifier);
 
                 if (result != null && result.ID != ID)
                 {
@@ -235,12 +228,12 @@ namespace Sushi.MailTemplate.Data
                 if (currentTemplateInDatabase != null && currentTemplateInDatabase.Identifier != Identifier)
                 {
                     // user changed the identifier, special case. All versions need to be updated
-                    var mailTemplatesToUpdate = MailTemplate.FetchAllByIdentifier(currentTemplateInDatabase.Identifier);
+                    var mailTemplatesToUpdate = await MailTemplate.FetchAllByIdentifierAsync(currentTemplateInDatabase.Identifier);
 
                     foreach (var mailTemplate in mailTemplatesToUpdate)
                     {
                         mailTemplate.Identifier = Identifier;
-                        connector.Save(mailTemplate);
+                        await connector.SaveAsync(mailTemplate);
                     }
                 }
 
@@ -267,9 +260,9 @@ namespace Sushi.MailTemplate.Data
                     GUID = Guid.NewGuid();
                 }
 
-                connector.Save(this);
+                await connector.SaveAsync(this);
 
-                return this.ID;
+                return ID;
             }
 
             return 0;
@@ -282,16 +275,16 @@ namespace Sushi.MailTemplate.Data
         /// <param name="userDisplayname"></param>
         /// <param name="userEmail"></param>
         /// <returns></returns>
-        public bool Revert(int userID, string userDisplayname, string userEmail)
+        public async Task<bool> RevertAsync(int userID, string userDisplayname, string userEmail)
         {
             var connector = new Connector<MailTemplate>();
-            var result = MailTemplate.FetchSingle(Identifier, VersionMajor);
+            var result = await MailTemplate.FetchSingleAsync(Identifier, VersionMajor);
 
             if (result != null && result.ID != ID)
             {
                 // unpublish current version
                 result.IsPublished = false;
-                connector.Save(result);
+                await connector.SaveAsync(result);
 
                 // create new version from old published template and publish directly
                 // this way the edit is saved as well
@@ -300,7 +293,7 @@ namespace Sushi.MailTemplate.Data
                 result.VersionMajor++;
                 result.UserID = userID;
                 result.UserName = $"{userDisplayname} ({userEmail})";
-                connector.Save(result);
+                await connector.SaveAsync(result);
             }
 
             return true;
@@ -313,18 +306,18 @@ namespace Sushi.MailTemplate.Data
         /// <param name="userDisplayname"></param>
         /// <param name="userEmail"></param>
         /// <returns></returns>
-        public bool Publish(int userID, string userDisplayname, string userEmail)
+        public async Task<bool> PublishAsync(int userID, string userDisplayname, string userEmail)
         {
             if (Logic.Helper.IsValidTemplate(Body, Subject))
             {
                 var connector = new Connector<MailTemplate>();
 
                 // unpublish all previous
-                var filter = connector.CreateDataFilter();
+                var filter = connector.CreateQuery();
                 filter.AddParameter("@identifier", System.Data.SqlDbType.NVarChar, Identifier);
                 var query = $@"UPDATE wim_MailTemplates SET MailTemplate_IsPublished = 0 WHERE MailTemplate_Identifier = @identifier";
 
-                connector.ExecuteNonQuery(query, filter);
+                await connector.ExecuteNonQueryAsync(query, filter);
 
                 // create new version
                 VersionMajor++;
@@ -336,19 +329,20 @@ namespace Sushi.MailTemplate.Data
                 ID = 0;
                 DateLastUpdated = DateTime.UtcNow;
                 DateCreated = DateTime.UtcNow;
-                connector.Save(this);
+                await connector.SaveAsync(this);
 
                 return true;
             }
 
             return false;
         }
+
         /// <summary>
         /// Deletes mail templates that are identified by their id.
         /// </summary>
         /// <param name="mailTemplateIDs"></param>
         /// <returns></returns>
-        public static bool Delete(List<int> mailTemplateIDs)
+        public static async Task<bool> DeleteAsync(List<int> mailTemplateIDs)
         {
             if (mailTemplateIDs != null && mailTemplateIDs.Count > 0)
             {
@@ -357,16 +351,18 @@ namespace Sushi.MailTemplate.Data
                 var connector = new Connector<MailTemplate>();
                 var query = $@"UPDATE wim_MailTemplates SET MailTemplate_IsArchived = 1 WHERE MailTemplate_Key IN ({joinedMailTemplateIDs})";
 
-                connector.ExecuteNonQuery(query);
+                await connector.ExecuteNonQueryAsync(query);
 
                 return true;
             }
             return false;
         }
+
         /// <summary>
         /// Add placeholders to this list, like template.PlaceholderList.Add("HOTEL", "Sunny Beach Hotel");
         /// </summary>
         public PlaceholderList PlaceholderList { get; set; } = new PlaceholderList();
+
         /// <summary>
         /// Add placeholder groups to this list, like template.PlaceholderGroupList.Add("rooms");
         /// template.PlaceholderGroupList.AddNewRow();
@@ -380,12 +376,14 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         public List<string> OptionalSections { get; set; } = new List<string>();
     }
+
     /// <summary>
     /// PlaceholderGroupList class, with methods to add items
     /// </summary>
     public class PlaceholderGroupList
     {
         internal Dictionary<string, Entities.PlaceholderGroup> PlaceholderGroupDictionary { get; set; } = new Dictionary<string, Entities.PlaceholderGroup>();
+        
         /// <summary>
         /// Add a group to the placeholder groups, like template.PlaceholderGroupList.Add("rooms");
         /// </summary>
@@ -402,6 +400,7 @@ namespace Sushi.MailTemplate.Data
         {
             PlaceholderGroupDictionary.Last().Value.AddNewRow();
         }
+
         /// <summary>
         /// Add a new item to the row of a placeholder group, like template.PlaceholderGroupList.AddNewRowItem("NAME", "Cus Tomer");
         /// </summary>
@@ -412,12 +411,14 @@ namespace Sushi.MailTemplate.Data
             PlaceholderGroupDictionary.Last().Value.AddNewRowItem(name, value);
         }
     }
+
     /// <summary>
     /// PlaceholderList class
     /// </summary>
     public class PlaceholderList
     {
         internal Dictionary<string, Entities.Placeholder> PlaceholderDictionary { get; set; } = new Dictionary<string, Entities.Placeholder>();
+        
         /// <summary>
         /// Add name-value pairs to the placeholder list, like template.PlaceholderList.Add("NAME", "Cus Tomer");
         /// </summary>

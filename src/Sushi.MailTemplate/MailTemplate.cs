@@ -11,37 +11,28 @@ namespace Sushi.MailTemplate
     /// </summary>
     public static class MailTemplate
     {
+
         /// <summary>
-        /// Gets a mail template by identifier
+        /// Gets a published mail template by its identifier
         /// </summary>
-        /// <param name="identifier"></param>
-        /// <returns></returns>
-        public static Data.MailTemplate Fetch(string identifier)
-        {
-            return Data.MailTemplate.FetchSingleByIdentifier(identifier);
-        }
-        /// <summary>
-        /// Gets a mail template by identifier
-        /// </summary>
-        /// <param name="identifier"></param>
+        /// <param name="identifier">The Mailtemplate identifier</param>
         /// <returns></returns>
         public static async Task<Data.MailTemplate> FetchAsync(string identifier)
         {
-            return await Data.MailTemplate.FetchSingleByIdentifierAsync(identifier);
+            return await Data.MailTemplate.FetchSingleByIdentifierAsync(identifier, true);
         }
+
         /// <summary>
-        /// Applies the placeholders to the body and the subject properties
+        /// Gets a mail template by its identifier
         /// </summary>
-        /// <param name="mailTemplate"></param>
-        /// <param name="logger"></param>
+        /// <param name="identifier">The Mailtemplate identifier</param>
+        /// <param name="onlyPublished">Should we only return published mailtemplates</param>
         /// <returns></returns>
-        public static Data.MailTemplate ApplyPlaceholders(Data.MailTemplate mailTemplate, System.IO.TextWriter logger = null)
+        public static async Task<Data.MailTemplate> FetchAsync(string identifier, bool onlyPublished)
         {
-            var placeholderGroupReplacements = mailTemplate.PlaceholderGroupList.PlaceholderGroupDictionary.Values.ToList();
-            var placeholderReplacements = mailTemplate.PlaceholderList.PlaceholderDictionary.Values.ToList();
-            var optionalSectionsReplacements = mailTemplate.OptionalSections;
-            return Logic.PlaceholderLogic.ApplyPlaceholders(mailTemplate, placeholderGroupReplacements, placeholderReplacements, optionalSectionsReplacements, logger);
+            return await Data.MailTemplate.FetchSingleByIdentifierAsync(identifier, onlyPublished);
         }
+
         /// <summary>
         /// Applies the placeholders to the body and the subject properties
         /// </summary>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate", "Sushi.MailTemplate\Sushi.MailTemplate.csproj", "{D3FE73A9-EE3A-418F-BAC3-538491531A2B}"
 EndProject
@@ -12,10 +12,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.MediaKiwi.Portal", "Sushi.MailTemplate.MediaKiwi.Portal\Sushi.MailTemplate.MediaKiwi.Portal.csproj", "{58F39DF7-20B2-4658-B326-D2425686AAE9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sushi.MailTemplate.Tests", "Sushi.MailTemplate.Tests\Sushi.MailTemplate.Tests.csproj", "{F8204D76-874A-466E-A530-1896E46020B7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.MediaKiwi.UI.MK", "Sushi.MailTemplate.MediaKiwi.NETFramework.UI\Sushi.MailTemplate.MediaKiwi.UI.MK.csproj", "{2123B9F0-8226-401B-877E-7BF31CC2B7C7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sushi.MailTemplate.MediaKiwi.NETFramework.Portal", "Sushi.MailTemplate.MediaKiwi.NETFramework.Portal\Sushi.MailTemplate.MediaKiwi.NETFramework.Portal.csproj", "{A21E3ED6-9496-451E-94DB-86460AFE35F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +39,6 @@ Global
 		{F8204D76-874A-466E-A530-1896E46020B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8204D76-874A-466E-A530-1896E46020B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8204D76-874A-466E-A530-1896E46020B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2123B9F0-8226-401B-877E-7BF31CC2B7C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2123B9F0-8226-401B-877E-7BF31CC2B7C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2123B9F0-8226-401B-877E-7BF31CC2B7C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2123B9F0-8226-401B-877E-7BF31CC2B7C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A21E3ED6-9496-451E-94DB-86460AFE35F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A21E3ED6-9496-451E-94DB-86460AFE35F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A21E3ED6-9496-451E-94DB-86460AFE35F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A21E3ED6-9496-451E-94DB-86460AFE35F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

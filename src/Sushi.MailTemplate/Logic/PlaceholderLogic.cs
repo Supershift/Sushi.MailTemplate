@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Sushi.MailTemplate.Entities;
-using Sushi.MailTemplate.Extensions;
 
 namespace Sushi.MailTemplate.Logic
 {
@@ -38,32 +37,13 @@ namespace Sushi.MailTemplate.Logic
         /// <param name="optionalSectionsReplacements"></param>
         /// <param name="logger"></param>
         /// <returns>MailTemplate with Body and Subject replaced</returns>
-        public static Data.MailTemplate ApplyPlaceholders(string mailTemplateIdentifier, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsReplacements = null, System.IO.TextWriter logger = null)
+        public static async Task<Data.MailTemplate> ApplyPlaceholdersAsync(string mailTemplateIdentifier, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsReplacements = null, System.IO.TextWriter logger = null)
         {
-            var mailTemplate = Data.MailTemplateList.FetchSingleByIdentifier(mailTemplateIdentifier);
+            var mailTemplate = await Data.MailTemplateList.FetchSingleByIdentifierAsync(mailTemplateIdentifier);
             if (mailTemplate != null)
             {
-                return ApplyPlaceholders(mailTemplate, placeholderGroupReplacements, placeholderReplacements, optionalSectionsReplacements, logger);
+                return await ApplyPlaceholdersAsync(mailTemplate, placeholderGroupReplacements, placeholderReplacements, optionalSectionsReplacements, logger);
             }
-
-            return mailTemplate;
-        }
-
-        /// <summary>
-        /// Provide a mail template object, placeholder group replacements, placeholder replacements and optional sections to include
-        /// </summary>
-        /// <param name="mailTemplate"></param>
-        /// <param name="placeholderGroupReplacements"></param>
-        /// <param name="placeholderReplacements"></param>
-        /// <param name="optionalSectionsToInclude"></param>
-        /// <param name="logger"></param>
-        /// <returns>MailTemplate with Body and Subject replaced</returns>
-        public static Data.MailTemplate ApplyPlaceholders(Data.MailTemplate mailTemplate, List<PlaceholderGroup> placeholderGroupReplacements = null, List<Placeholder> placeholderReplacements = null, List<string> optionalSectionsToInclude = null, System.IO.TextWriter logger = null)
-        {
-            var listOfDefaultValues = Data.DefaultValuePlaceholder.FetchAllByMailTemplate(mailTemplate.Identifier);
-
-            mailTemplate.Body = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Body, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
-            mailTemplate.Subject = HttpUtility.HtmlDecode(ApplyPlaceholders(mailTemplate.Subject, logger, placeholderGroupReplacements, placeholderReplacements, listOfDefaultValues, optionalSectionsToInclude));
 
             return mailTemplate;
         }

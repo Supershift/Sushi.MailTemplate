@@ -1,13 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>41f0a506-a48e-4017-a740-ff2b62c8a2e0</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Sushi.Mediakiwi" Version="7.15.16" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sushi.MailTemplate.MediaKiwi.UI\Sushi.MailTemplate.MediaKiwi.UI.csproj" />
