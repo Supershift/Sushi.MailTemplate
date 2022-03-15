@@ -46,41 +46,7 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         public string Value { get; set; }
 
-        /// <summary>
-        /// Saves the current default value
-        /// </summary>
-        /// <returns></returns>
-        public async Task<int> SaveAsync()
-        {
-            var connector = new Connector<DefaultValuePlaceholder>();
-            await connector.SaveAsync(this);
-            return ID;
-        }
-
-        /// <summary>
-        /// Deletes the current default value
-        /// </summary>
-        public async Task DeleteAsync()
-        {
-            var connector = new Connector<DefaultValuePlaceholder>();
-            await connector.DeleteAsync(this);
-        }
-
-   
-        /// <summary>
-        /// Fetch all default values by mail template identifier
-        /// </summary>
-        /// <param name="mailTemplateIdentifier"></param>
-        /// <returns></returns>
-        public static async Task<List<DefaultValuePlaceholder>> FetchAllByMailTemplateAsync(string mailTemplateIdentifier)
-        {
-            var connector = new Connector<DefaultValuePlaceholder>();
-            var filter = connector.CreateQuery();
-            filter.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
-            filter.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
-
-            return await connector.FetchAllAsync(filter);
-        }
+        
 
     }
 }

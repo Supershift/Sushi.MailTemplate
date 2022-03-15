@@ -1,5 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
+using Microsoft.Extensions.Options;
+using Sushi.MailTemplate.Logic;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,12 +13,12 @@ namespace Sushi.MailTemplate.SendGrid
     /// <summary>
     /// SendGrid Mailer class to be used in conjunction with Wim.Module.MailTemplate
     /// </summary>
-    public class Mailer
+    public class Mailer : ISendPreviewEmailEventHandler
     {
-        internal string EmailBlobContainer { get; private set; }
-        internal string EmailStorageAccount { get; private set; }
-        internal string EmailQueueName { get; private set; }
-        internal string SendGridAPIKey { get; private set; }
+        private readonly MailTemplateHelper _mailTemplateHelper;
+        private readonly SendGridMailerOptions _sendGridMailerOptions;
+
+
 
         /// <summary>
         /// Mailer Constructor
@@ -25,14 +27,10 @@ namespace Sushi.MailTemplate.SendGrid
         /// <param name="emailBlobContainer"></param>
         /// <param name="emailQueueName"></param>
         /// <param name="sendGridAPIKey"></param>
-        public Mailer(string emailStorageAccount, string emailBlobContainer, string emailQueueName, string sendGridAPIKey)
+        public Mailer(MailTemplateHelper mailTemplateHelper, IOptions<SendGridMailerOptions> sendGridMailerOptions)
         {
-            EmailStorageAccount = emailStorageAccount;
-            EmailBlobContainer = emailBlobContainer;
-            EmailQueueName = emailQueueName;
-            SendGridAPIKey = sendGridAPIKey;
-
-            Logic.SendPreviewEmailEventHandler.SendPreviewEmailAsync += SendPreviewEmailEventHandler_SendPreviewEmailAsync;
+            _mailTemplateHelper = mailTemplateHelper;
+            _sendGridMailerOptions = sendGridMailerOptions.Value;
         }
 
         private async Task SendPreviewEmailEventHandler_SendPreviewEmailAsync(object sender, Logic.SendPreviewEmailEventArgs e)
@@ -45,7 +43,7 @@ namespace Sushi.MailTemplate.SendGrid
                 var body = e.Body;
                 var templateName = e.TemplateName;
 
-                var mailTemplate = await MailTemplate.FetchAsync(templateName);
+                var mailTemplate = await _mailTemplateHelper.FetchAsync(templateName);
 
                 var emailToSend = new Email
                 {
@@ -64,19 +62,6 @@ namespace Sushi.MailTemplate.SendGrid
                 e.ErrorMessage = ex.Message;
                 e.IsSuccess = false;
             }
-        }
-
-        /// <summary>
-        /// Mailer Constructor
-        /// </summary>
-        /// <param name="emailStorageAccount"></param>
-        /// <param name="emailBlobContainer"></param>
-        /// <param name="emailQueueName"></param>
-        public Mailer(string emailStorageAccount, string emailBlobContainer, string emailQueueName)
-        {
-            EmailStorageAccount = emailStorageAccount;
-            EmailBlobContainer = emailBlobContainer;
-            EmailQueueName = emailQueueName;
         }
 
         /// <summary>
@@ -123,8 +108,8 @@ namespace Sushi.MailTemplate.SendGrid
             string bccs = mail.BCCReceivers;
 
             // get blob information
-            var blobPersister = new BlobPersister(EmailStorageAccount);
-            var blob = await blobPersister.GetBlockBlobReferenceAsync(EmailBlobContainer, id.ToString());
+            var blobPersister = new BlobPersister(_sendGridMailerOptions.EmailStorageAccount);
+            var blob = await blobPersister.GetBlockBlobReferenceAsync(_sendGridMailerOptions.EmailBlobContainer, id.ToString());
 
             // create email message to save to blob
             var email = new Email
@@ -142,8 +127,8 @@ namespace Sushi.MailTemplate.SendGrid
             var jsonEmail = Newtonsoft.Json.JsonConvert.SerializeObject(email);
 
             // create queue information
-            var queuePersister = new QueuePersister(EmailStorageAccount);
-            var queue = await queuePersister.GetQueueAsync(EmailQueueName);
+            var queuePersister = new QueuePersister(_sendGridMailerOptions.EmailStorageAccount);
+            var queue = await queuePersister.GetQueueAsync(_sendGridMailerOptions.EmailQueueName);
 
             return (blob, queue, jsonEmail);
         }
@@ -155,7 +140,7 @@ namespace Sushi.MailTemplate.SendGrid
         /// <returns></returns>
         public async Task<bool> SendMailAsync(Email email)
         {
-            if (string.IsNullOrEmpty(SendGridAPIKey))
+            if (string.IsNullOrEmpty(_sendGridMailerOptions.SendGridAPIKey))
             {
                 throw new ApplicationException("SendGridAPIKey is empty");
             }
@@ -169,7 +154,7 @@ namespace Sushi.MailTemplate.SendGrid
             string templateName = email.TemplateName;
             Guid? customerGuid = email.CustomerGUID;
 
-            var client = new SG.SendGridClient(SendGridAPIKey);
+            var client = new SG.SendGridClient(_sendGridMailerOptions.SendGridAPIKey);
 
             var message = SG.Helpers.Mail.MailHelper.CreateSingleEmail(
                 new SG.Helpers.Mail.EmailAddress(emailFrom, emailFromName),
@@ -221,17 +206,17 @@ namespace Sushi.MailTemplate.SendGrid
         /// <param name="id">id of blob</param>
         public async Task<bool> SendMailFromBlobAsync(string id)
         {
-            if (string.IsNullOrEmpty(SendGridAPIKey))
+            if (string.IsNullOrEmpty(_sendGridMailerOptions.SendGridAPIKey))
             {
                 throw new ApplicationException("SendGridAPIKey is empty");
             }
 
             // get storage account
             // get blob persister
-            var blobPersister = new BlobPersister(EmailStorageAccount);
+            var blobPersister = new BlobPersister(_sendGridMailerOptions.EmailStorageAccount);
 
             // get blob information
-            var blob = await blobPersister.GetBlockBlobReferenceAsync(EmailBlobContainer, id.ToString());
+            var blob = await blobPersister.GetBlockBlobReferenceAsync(_sendGridMailerOptions.EmailBlobContainer, id.ToString());
 
             // check if the blob exists
             if (await blob.ExistsAsync())
@@ -249,7 +234,7 @@ namespace Sushi.MailTemplate.SendGrid
                 string templateName = email.TemplateName;
                 Guid? customerGuid = email.CustomerGUID;
 
-                var client = new SG.SendGridClient(SendGridAPIKey);
+                var client = new SG.SendGridClient(_sendGridMailerOptions.SendGridAPIKey);
 
                 var message = SG.Helpers.Mail.MailHelper.CreateSingleEmail(
                     new SG.Helpers.Mail.EmailAddress(emailFrom, emailFromName),
@@ -308,6 +293,30 @@ namespace Sushi.MailTemplate.SendGrid
                 // blob doesn't exist
                 throw new ApplicationException($"Blob {id} not found");
             }
+        }
+
+        public async Task SendPreviewEmailAsync(SendPreviewEmailEventArgs e)
+        {
+
+            var emailFrom = e.EmailFrom;
+            var emailTo = e.EmailTo;
+            var subject = e.Subject;
+            var body = e.Body;
+            var templateName = e.TemplateName;
+
+            var mailTemplate = await _mailTemplateHelper.FetchAsync(templateName);
+
+            var emailToSend = new Email
+            {
+                From = emailFrom,
+                FromName = mailTemplate.DefaultSenderName,
+                TemplateName = templateName,
+                Body = body,
+                Subject = subject,
+                To = emailTo
+            };
+
+            e.IsSuccess = await SendMailAsync(emailToSend);
         }
     }
 }

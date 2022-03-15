@@ -9,10 +9,13 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
     /// </summary>
     public class DefaultValues_List : ComponentListTemplate
     {
+        private readonly Data.MailTemplateRepository _mailTemplateRepository;
+        private readonly Data.DefaultValuePlaceholderRepository _defaultValuePlaceholderRepository;
+
         /// <summary>
         /// DefaultValues_List ctor
         /// </summary>
-        public DefaultValues_List()
+        public DefaultValues_List(Data.MailTemplateRepository mailTemplateRepository, Data.DefaultValuePlaceholderRepository defaultValuePlaceholderRepository)
         {
             // additional styles for border around the ListDataEditConfiguration textbox
             //wim.Page.Head.AddStyle("/css/mediakiwiStyles.css", true);
@@ -22,6 +25,8 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             ListSave += DefaultValues_List_ListSave;
             ListSearch += DefaultValues_List_ListSearch;
+            _mailTemplateRepository = mailTemplateRepository;
+            _defaultValuePlaceholderRepository = defaultValuePlaceholderRepository;
         }
 
         private async Task DefaultValues_List_ListSearch(ComponentListSearchEventArgs e)
@@ -32,9 +37,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
                 int.TryParse(idQueryString, out int id);
 
-                var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
+                var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
 
-                var list = await Data.DefaultValuePlaceholder.FetchAllByMailTemplateAsync(mailTemplate.Identifier);
+                var list = await _defaultValuePlaceholderRepository.FetchAllByMailTemplateAsync(mailTemplate.Identifier);
 
                 var subjectPlaceholders = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Subject);
                 var bodyPlaceholders = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Body);
@@ -84,25 +89,25 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                         {
                             if (mailTemplate == null)
                             {
-                                mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
+                                mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
                             }
 
                             // create
                             defaultValue.ID = 0;
                             defaultValue.MailTemplateID = mailTemplate.ID;
-                            await defaultValue.SaveAsync();
+                            await _defaultValuePlaceholderRepository.SaveAsync(defaultValue);
                         }
                         else
                         {
                             if (string.IsNullOrEmpty(defaultValue.Value))
                             {
                                 // delete
-                                await defaultValue.DeleteAsync();
+                                await _defaultValuePlaceholderRepository.DeleteAsync(defaultValue);
                             }
                             else
                             {
                                 // edit
-                                await defaultValue.SaveAsync();
+                                await _defaultValuePlaceholderRepository.SaveAsync(defaultValue);
                             }
                         }
                     }

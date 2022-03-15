@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>2.0.0</Version>
+    <Version>3.0.0-a</Version>
     <Authors>Supershift B.V.</Authors>
     <Company>Supershift B.V.</Company>
     <Description>Provides UI classes to use Sushi.Mailtemplate in Sushi.MediaKiwi.</Description>

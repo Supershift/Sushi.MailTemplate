@@ -45,10 +45,6 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMediakiwi();
-
-            // initiate
-            // hook up the Mailer to the SendPreviewEmailEventHandler.SendPreviewEmail
-            _ = new Mailer(Configuration["EmailStorageAccount"], Configuration["EmailBlobContainer"], Configuration["EmailQueueName"], Configuration["SendGridAPIKey"]);
         }
     }
 }

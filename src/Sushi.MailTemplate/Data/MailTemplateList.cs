@@ -49,55 +49,7 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         public long? seqnum { get; set; }
 
-        /// <summary>
-        /// Fetch all mail templates
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static async Task<List<MailTemplateList>> FetchAllAsync(string name = "")
-        {
-            var connector = new Connector<MailTemplateList>();
-            var filter = connector.CreateQuery();
-
-            filter.AddOrder(x => x.Name);
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                string searchLike = $"%{name}%";
-                filter.AddSql($"(MailTemplate_Name LIKE @searchLike OR MailTemplate_Identifier LIKE @searchLike)");
-                filter.AddParameter("@searchLike", System.Data.SqlDbType.NVarChar, searchLike);
-            }
-
-            var result = await connector.FetchAllAsync(filter);
-
-            return result;
-        }
-    
-        /// <summary>
-        /// Fetch one mail template by identifier
-        /// </summary>
-        /// <param name="identifier"></param>
-        /// <returns></returns>
-        public static async new Task<MailTemplateList> FetchSingleByIdentifierAsync(string identifier)
-        {
-            var connector = new Connector<MailTemplateList>();
-            var filter = connector.CreateQuery();
-            filter.Add(x => x.Identifier, identifier, ComparisonOperator.Like);
-            var result = await connector.FetchSingleAsync(filter);
-            return result;
-        }
-
-        /// <summary>
-        /// Fetch one mail template by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public static async new Task<MailTemplateList> FetchSingleAsync(int id)
-        {
-            var connector = new Connector<MailTemplateList>();
-            var result = await connector.FetchSingleAsync(id);
-            return result;
-        }
+        
 
         /// <summary>
         /// Internal property for Mediakiwi to see if the record is selected

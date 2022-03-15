@@ -11,10 +11,13 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
     /// </summary>
     public class MailTemplates_List : ComponentListTemplate
     {
+        private readonly Data.MailTemplateRepository _mailTemplateRepository;
+        private readonly Data.MailTemplateListRepository _mailTemplateListRepository;
+
         /// <summary>
         /// MailTemplates_List ctor
         /// </summary>
-        public MailTemplates_List()
+        public MailTemplates_List(Data.MailTemplateRepository mailTemplateRepository, Data.MailTemplateListRepository mailTemplateListRepository)
         {
             wim.OpenInEditMode = false;
             //wim.CurrentList.Option_AfterSaveListView = false;
@@ -24,6 +27,8 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             ListAction += MailTemplatesList_ListAction;
             ListPreRender += MailTemplates_List_ListPreRender;
             ListSave += MailTemplatesList_ListSave;
+            _mailTemplateRepository = mailTemplateRepository;
+            _mailTemplateListRepository = mailTemplateListRepository;
         }
 
         private async Task MailTemplates_List_ListPreRender(ComponentListEventArgs e)
@@ -47,7 +52,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             }
 
             //check there are no other templates with the same identifier
-            var otherMailTemplate = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Implement.Identifier);
+            var otherMailTemplate = await _mailTemplateListRepository.FetchSingleByIdentifierAsync(Implement.Identifier);
 
             if (otherMailTemplate != null && otherMailTemplate.ID != Implement.ID)
             {
@@ -70,15 +75,15 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
         private async Task MailTemplatesList_ListSave(ComponentListEventArgs e)
         {
-            var currentTemplateInDatabase = await Data.MailTemplateList.FetchSingleAsync(Implement.ID);
-            var result = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Identifier);
+            var currentTemplateInDatabase = await _mailTemplateListRepository.FetchSingleAsync(Implement.ID);
+            var result = await _mailTemplateListRepository.FetchSingleByIdentifierAsync(Identifier);
 
             if (result != null && result.ID != Implement.ID)
             {
                 await Notification.InsertOneAsync("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
             }
 
-            var id = await Implement.SaveAsync(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email);
+            var id = await _mailTemplateRepository.SaveAsync(Implement, wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email);
 
             Response.Redirect(wim.GetUrl(new KeyValue[] {
                         new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
@@ -98,7 +103,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     mailTemplateIDs.Add(mailTemplate.ID);
                 }
 
-                var isSuccess = await Data.MailTemplate.DeleteAsync(mailTemplateIDs);
+                var isSuccess = await _mailTemplateRepository.DeleteAsync(mailTemplateIDs);
 
                 if (!isSuccess)
                 {
@@ -112,14 +117,14 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             if (BtnPublish && await CanSaveAsync())
             {
-                var result = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Identifier);
+                var result = await _mailTemplateListRepository.FetchSingleByIdentifierAsync(Identifier);
 
                 if (result != null && result.ID != Implement.ID)
                 {
                     await Notification.InsertOneAsync("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
                 }
 
-                if (await Implement.PublishAsync(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
+                if (await _mailTemplateRepository.PublishAsync(Implement, wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
                 {
                     wim.CurrentVisitor.Data.Apply("wim.note", "Template is published", null);
                     await wim.CurrentVisitor.SaveAsync();
@@ -131,7 +136,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 }
             }
 
-            if (BtnRevert && await Implement.RevertAsync(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
+            if (BtnRevert && await _mailTemplateRepository.RevertAsync(Implement, wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))
             {
                 wim.Notification.AddNotificationAlert($"Template has been reverted to the published version", true);
 
@@ -155,10 +160,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
         private async Task MailTemplatesList_ListLoad(ComponentListEventArgs e)
         {
-            Implement = await Data.MailTemplate.FetchSingleAsync(e.SelectedKey);
+            Implement = await _mailTemplateRepository.FetchSingleAsync(e.SelectedKey);
             if (Implement != null)
             {
-                var latestTemplate = await Data.MailTemplateList.FetchSingleByIdentifierAsync(Implement.Identifier);
+                var latestTemplate = await _mailTemplateListRepository.FetchSingleByIdentifierAsync(Implement.Identifier);
 
                 if (latestTemplate != null && Implement.ID != latestTemplate.ID)
                 {
@@ -220,7 +225,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             wim.ListDataColumns.Add(new ListDataColumn("Has published version", nameof(Data.MailTemplate.HasPublishedVersion)));
             wim.ListDataColumns.Add(new ListDataColumn("Is current published", nameof(Data.MailTemplate.IsPublished)));
 
-            var items = await Data.MailTemplateList.FetchAllAsync(FilterText);
+            var items = await _mailTemplateListRepository.FetchAllAsync(FilterText);
             wim.ListDataAdd(items);
         }
 
