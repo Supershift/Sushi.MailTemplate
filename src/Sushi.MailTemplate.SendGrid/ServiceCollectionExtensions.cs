@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,20 @@ namespace Sushi.MailTemplate.SendGrid
         {
             services.Configure(configureOptions);
 
+            AddSushiMailTemplateSendgrid(services);
+        }
+
+        public static void AddSushiMailTemplateSendgrid(this IServiceCollection services, IConfiguration namedConfigurationSection)
+        {
+            services.Configure<SendGridMailerOptions>(namedConfigurationSection);
+
+            AddSushiMailTemplateSendgrid(services);
+        }
+
+        private static void AddSushiMailTemplateSendgrid(IServiceCollection services)
+        {
             services.AddTransient<Mailer>();
             services.AddTransient<Logic.ISendPreviewEmailEventHandler, Mailer>();
-            
         }
     }
 }

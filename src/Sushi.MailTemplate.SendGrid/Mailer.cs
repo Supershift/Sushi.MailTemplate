@@ -155,7 +155,7 @@ namespace Sushi.MailTemplate.SendGrid
             Guid? customerGuid = email.CustomerGUID;
 
             var client = new SG.SendGridClient(_sendGridMailerOptions.SendGridAPIKey);
-
+            
             var message = SG.Helpers.Mail.MailHelper.CreateSingleEmail(
                 new SG.Helpers.Mail.EmailAddress(emailFrom, emailFromName),
                 new SG.Helpers.Mail.EmailAddress(emailTo),

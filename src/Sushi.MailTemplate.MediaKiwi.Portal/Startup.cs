@@ -6,6 +6,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Sushi.Mediakiwi;
+using Sushi.MailTemplate.Extensions;
+using Sushi.MailTemplate.SendGrid;
+using Sushi.MicroORM;
 
 namespace Sushi.MailTemplate.MediaKiwi.Portal
 {
@@ -28,6 +31,16 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
+
+            // add sushi micro orm
+            string defaultConnectionString = Configuration.GetConnectionString("datastore");
+            services.AddMicroORM(defaultConnectionString);
+
+            // add mail templating
+            services.AddSushiMailTemplate();
+
+            // add sendgrid
+            services.AddSushiMailTemplateSendgrid(Configuration.GetSection("SendGrid"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
