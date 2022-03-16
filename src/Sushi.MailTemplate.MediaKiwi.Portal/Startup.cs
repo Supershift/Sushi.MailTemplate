@@ -32,15 +32,17 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
 
-            // add sushi micro orm
-            string defaultConnectionString = Configuration.GetConnectionString("datastore");
-            services.AddMicroORM(defaultConnectionString);
+            string databaseConnectionString = Configuration.GetConnectionString("datastore");
+            string azureConnectionString = Configuration.GetConnectionString("azurestore");
+
+            // add sushi micro orm            
+            services.AddMicroORM(databaseConnectionString);
 
             // add mail templating
             services.AddSushiMailTemplate();
 
             // add sendgrid
-            services.AddSushiMailTemplateSendgrid(Configuration.GetSection("SendGrid"));
+            services.AddSushiMailTemplateSendgrid(Configuration.GetSection("SendGrid"), azureConnectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

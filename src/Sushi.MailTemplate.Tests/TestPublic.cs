@@ -55,10 +55,8 @@ namespace Sushi.MailTemplate.Tests
             services.AddSushiMailTemplate();
             services.AddSushiMailTemplateSendgrid(options=>
             {
-                options.EmailStorageAccount = Configuration["EmailStorageAccount"];
-                options.EmailBlobContainer = Configuration["EmailBlobContainer"];
-                options.EmailQueueName = Configuration["EmailQueueName"];
-                options.SendGridAPIKey = Configuration["SendGridAPIKey"];
+                options.AzureStorageAccount = Configuration.GetConnectionString("azurestore");                
+                options.ApiKey = Configuration["SendGrid:ApiKey"];
             });
             ServiceProvider = services.BuildServiceProvider();
         }
