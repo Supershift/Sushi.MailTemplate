@@ -37,36 +37,7 @@ namespace Sushi.MailTemplate.SendGrid
             _sendGridMailerOptions = sendGridMailerOptions.Value;
         }
 
-        private async Task SendPreviewEmailEventHandler_SendPreviewEmailAsync(object sender, Logic.SendPreviewEmailEventArgs e)
-        {
-            try
-            {
-                var emailFrom = e.EmailFrom;
-                var emailTo = e.EmailTo;
-                var subject = e.Subject;
-                var body = e.Body;
-                var templateName = e.TemplateName;
-
-                var mailTemplate = await _mailTemplateHelper.FetchAsync(templateName);
-
-                var emailToSend = new Email
-                {
-                    From = emailFrom,
-                    FromName = mailTemplate.DefaultSenderName,
-                    TemplateName = templateName,
-                    Body = body,
-                    Subject = subject,
-                    To = emailTo
-                };
-
-                e.IsSuccess = await SendMailAsync(emailToSend);
-            }
-            catch (Exception ex)
-            {
-                e.ErrorMessage = ex.Message;
-                e.IsSuccess = false;
-            }
-        }
+        
 
         /// <summary>
         /// QueueMail inserts a queue message and saves the Data.MailTemplate mail in blob storage.
@@ -295,22 +266,17 @@ namespace Sushi.MailTemplate.SendGrid
 
         public async Task SendPreviewEmailAsync(SendPreviewEmailEventArgs e)
         {
-
             var emailFrom = e.EmailFrom;
             var emailTo = e.EmailTo;
-            var subject = e.Subject;
-            var body = e.Body;
-            var templateName = e.TemplateName;
-
-            var mailTemplate = await _mailTemplateHelper.FetchAsync(templateName);
+            
 
             var emailToSend = new Email
             {
                 From = emailFrom,
-                FromName = mailTemplate.DefaultSenderName,
-                TemplateName = templateName,
-                Body = body,
-                Subject = subject,
+                FromName = e.MailTemplate.DefaultSenderName,
+                TemplateName = e.MailTemplate.Name,
+                Body = e.MailTemplate.Body,
+                Subject = e.MailTemplate.Subject,
                 To = emailTo
             };
 

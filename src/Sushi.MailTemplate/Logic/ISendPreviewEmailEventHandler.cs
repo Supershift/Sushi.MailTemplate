@@ -37,20 +37,7 @@ namespace Sushi.MailTemplate.Logic
         /// </summary>
         public string EmailTo { get; set; }
 
-        /// <summary>
-        /// Subject of the e-mail
-        /// </summary>
-        public string Subject { get; set; }
-
-        /// <summary>
-        /// Body of the e-mail
-        /// </summary>
-        public string Body { get; set; }
-
-        /// <summary>
-        /// Template name, as identifier
-        /// </summary>
-        public string TemplateName { get; set; }
+        public Data.MailTemplate MailTemplate { get; set; }
 
         /// <summary>
         /// Shows if sending the preview was successful
