@@ -11,6 +11,20 @@ In Visual Studio's [Package Manager Console](http://docs.nuget.org/docs/start-he
 enter the following command:
 
     Install-Package Sushi.MailTemplate
+### Register Sushi.MailTemplate
+In the startup of your app, register and configure Sushi.MailTemplate:
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+	// add sushi micro orm            
+	services.AddMicroORM(databaseConnectionString);
+
+	// add mail templating
+	services.AddSushiMailTemplate();
+}
+```
+
+Also register Sushi.MicroOrm if you haven't already.
 ### Mediakiwi Portal
 Add the following lists to your Mediakiwi portal:
 * MailTemplates_List

@@ -7,28 +7,14 @@ namespace Sushi.MailTemplate.Logic
     /// SendPreviewEmailEventHandler class, to handle preview e-mails. This needs implementation on the referencing project like 
     /// Sushi.MailTemplate.Logic.SendPreviewEmailEventHandler.SendPreviewEmail += OnSendPreviewEmail;
     /// </summary>
-    public class SendPreviewEmailEventHandler
+    public interface ISendPreviewEmailEventHandler
     {
-
-        /// <summary>
-        /// Async version of the SendPreviewEmailAsync method
-        /// </summary>
-        public static event Func<object, SendPreviewEmailEventArgs, Task> SendPreviewEmailAsync;
-
         /// <summary>
         /// Async invokation of the SendPreviewEmailAsync
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public virtual async Task OnSendPreviewEmailAsync(SendPreviewEmailEventArgs e)
-        {
-            var task = SendPreviewEmailAsync?.Invoke(this, e);
-
-            if (task != null)
-            {
-                await task.ConfigureAwait(false);
-            }
-        }
+        public Task SendPreviewEmailAsync(SendPreviewEmailEventArgs e);        
     }
 
     /// <summary>

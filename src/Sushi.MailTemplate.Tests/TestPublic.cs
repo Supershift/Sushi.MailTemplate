@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sushi.MailTemplate.Extensions;
 using Sushi.MailTemplate.SendGrid;
+using Sushi.MicroORM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +14,8 @@ namespace Sushi.MailTemplate.Tests
     [TestClass]
     public class TestPublic
     {
-        IConfigurationRoot Configuration;
+        static IConfigurationRoot Configuration;
+        static IServiceProvider ServiceProvider;
 
         private static string TEST_SENDER_EMAIL = "[YOUR_TEST_EMAIL_ADDRESS]";
         private static string TEST_SENDER_NAME = "[YOUR_TEST_NAME]";
@@ -29,28 +33,45 @@ namespace Sushi.MailTemplate.Tests
             TEST_TEMPLATE_ID_GROUPS, 
             TEST_TEMPLATE_ID_SECTIONS 
         };
+        private readonly MailTemplateHelper _mailTemplateHelper;
+        private readonly Data.MailTemplateRepository _mailTemplateRepository;
+        private readonly Data.MailTemplateListRepository _mailTemplateListRepository;
+        private readonly Mailer _mailer;
 
-        [TestInitialize]
-        public void Init()
+        [AssemblyInitialize]
+        public static async Task AssemblyInitialize(TestContext context)
         {
-            Configuration = new ConfigurationBuilder()                                                          
-                                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+            Configuration = new ConfigurationBuilder()                                                                                          
                                 .AddUserSecrets<TestPublic>()
                                 .AddEnvironmentVariables()
-                                .Build();            
+                                .Build();
+
+
+            IServiceCollection services = new ServiceCollection();
+
+            string defaultConnectionString = Configuration.GetConnectionString("datastore");
+            services.AddMicroORM(defaultConnectionString);
             
-            MicroORM.DatabaseConfiguration.SetDefaultConnectionString(Configuration.GetConnectionString("datastore"));
+            services.AddSushiMailTemplate();
+            services.AddSushiMailTemplateSendgrid(options=>
+            {
+                options.AzureStorageAccount = Configuration.GetConnectionString("azurestore");                
+                options.ApiKey = Configuration["SendGrid:ApiKey"];
+            });
+            ServiceProvider = services.BuildServiceProvider();
+        }
+
+        public TestPublic()
+        {
+            _mailTemplateHelper = ActivatorUtilities.CreateInstance<MailTemplateHelper>(ServiceProvider);
+            _mailTemplateRepository = ActivatorUtilities.CreateInstance<Data.MailTemplateRepository>(ServiceProvider);
+            _mailTemplateListRepository = ActivatorUtilities.CreateInstance<Data.MailTemplateListRepository>(ServiceProvider);
+            _mailer = ActivatorUtilities.CreateInstance<Mailer>(ServiceProvider);
         }
 
         [TestMethod]
         public async Task QueueMail()
-        {
-            var emailStorageAccount = Configuration["EmailStorageAccount"];
-            var emailBlobContainer = Configuration["EmailBlobContainer"];
-            var emailQueueName = Configuration["EmailQueueName"];
-            var sendGridAPIKey = Configuration["SendGridAPIKey"];
-            var mailer = new Mailer(emailStorageAccount, emailBlobContainer, emailQueueName, sendGridAPIKey);
-
+        {   
             var mail = new Data.MailTemplate
             {
                 DefaultSenderEmail = TEST_SENDER_EMAIL,
@@ -60,7 +81,7 @@ namespace Sushi.MailTemplate.Tests
                 Identifier = TEST_TEMPLATE_ID
             };
 
-            var result = await mailer.QueueMailAsync(mail, emailTo: TEST_RECEIVER_EMAIL, customerGUID: null);
+            var result = await _mailer.QueueMailAsync(mail, emailTo: TEST_RECEIVER_EMAIL, customerGUID: null);
 
             Assert.IsTrue(result);
         }
@@ -70,11 +91,11 @@ namespace Sushi.MailTemplate.Tests
         {
             foreach (var item in TEST_TEMPLATES)
             {
-                var mailTemplate = await MailTemplate.FetchAsync(item, false);
+                var mailTemplate = await _mailTemplateHelper.FetchAsync(item, false);
                 if (mailTemplate?.ID > 0)
                 {
-                    await mailTemplate.SaveAsync(mailTemplate.UserID.Value, TEST_USER_NAME, TEST_USER_EMAIL);
-                    await mailTemplate.PublishAsync(mailTemplate.UserID.Value, TEST_USER_NAME, TEST_USER_EMAIL);
+                    await _mailTemplateRepository.SaveAsync(mailTemplate, mailTemplate.UserID.Value, TEST_USER_NAME, TEST_USER_EMAIL);
+                    await _mailTemplateRepository.PublishAsync(mailTemplate, mailTemplate.UserID.Value, TEST_USER_NAME, TEST_USER_EMAIL);
                 }
                 else 
                 {
@@ -90,12 +111,8 @@ namespace Sushi.MailTemplate.Tests
             try
             {
                 var id = TEST_QUEUED_MAIL_ID;
-                var emailStorageAccount = Configuration["EmailStorageAccount"];
-                var emailBlobContainer = Configuration["EmailBlobContainer"];
-                var emailQueueName = Configuration["EmailQueueName"];
-                var sendGridAPIKey = Configuration["SendGridAPIKey"];
-                var mailer = new Mailer(emailStorageAccount, emailBlobContainer, emailQueueName, sendGridAPIKey);
-                var result = await mailer.SendMailFromBlobAsync(id);
+                
+                var result = await _mailer.SendMailFromBlobAsync(id);
 
                 Assert.IsTrue(result);
             }
@@ -110,13 +127,7 @@ namespace Sushi.MailTemplate.Tests
         {
             try
             {
-                var emailStorageAccount = Configuration["EmailStorageAccount"];
-                var emailBlobContainer = Configuration["EmailBlobContainer"];
-                var emailQueueName = Configuration["EmailQueueName"];
-                var sendGridAPIKey = Configuration["SendGridAPIKey"];
-                var mailer = new Mailer(emailStorageAccount, emailBlobContainer, emailQueueName, sendGridAPIKey);
-
-                var template = await MailTemplate.FetchAsync(TEST_TEMPLATE_ID);
+                var template = await _mailTemplateHelper.FetchAsync(TEST_TEMPLATE_ID);
 
                 template.PlaceholderList.Add("PREVIEWTEXT", "TEST: This is the previewtext");
                 template.PlaceholderList.Add("INTRO", "TEST: This is the intro text");
@@ -133,7 +144,7 @@ namespace Sushi.MailTemplate.Tests
                 template.PlaceholderGroupList.AddNewRow();
                 template.PlaceholderGroupList.AddNewRowItem("REPEATEDPLACEHOLDER", "TEST: This is a repeated placeholder 3");
 
-                template = await MailTemplate.ApplyPlaceholdersAsync(template, Console.Out);
+                template = await _mailTemplateHelper.ApplyPlaceholdersAsync(template, Console.Out);
 
                 var email = new Email
                 {
@@ -146,7 +157,7 @@ namespace Sushi.MailTemplate.Tests
                     Subject = template.Subject
                 };
 
-                var result = await mailer.SendMailAsync(email);
+                var result = await _mailer.SendMailAsync(email);
 
                 Assert.IsTrue(result);
             }
@@ -159,7 +170,7 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task GetTemplateAndApplyPlaceholders()
         {
-            var template = await MailTemplate.FetchAsync(TEST_TEMPLATE_ID);
+            var template = await _mailTemplateHelper.FetchAsync(TEST_TEMPLATE_ID);
 
             if (template?.ID > 0)
             {
@@ -170,7 +181,7 @@ namespace Sushi.MailTemplate.Tests
                 template.PlaceholderList.Add("OUTRO", "TEST: This is the outro text");
                 template.PlaceholderList.Add("FOOTERTITLE", "TEST: This is the footer title");
 
-                var mail = await MailTemplate.ApplyPlaceholdersAsync(template, Console.Out);
+                var mail = await _mailTemplateHelper.ApplyPlaceholdersAsync(template, Console.Out);
 
                 Console.WriteLine(mail);
 
@@ -185,7 +196,7 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task GetTemplateAndApplyPlaceholdersWithGroups()
         {
-            var template = await MailTemplate.FetchAsync(TEST_TEMPLATE_ID_GROUPS);
+            var template = await _mailTemplateHelper.FetchAsync(TEST_TEMPLATE_ID_GROUPS);
 
             if (template?.ID > 0)
             {
@@ -204,7 +215,7 @@ namespace Sushi.MailTemplate.Tests
                 template.PlaceholderGroupList.AddNewRow();
                 template.PlaceholderGroupList.AddNewRowItem("REPEATEDPLACEHOLDER", "TEST: This is a repeated placeholder 3");
 
-                var mail = await MailTemplate.ApplyPlaceholdersAsync(template, Console.Out);
+                var mail = await _mailTemplateHelper.ApplyPlaceholdersAsync(template, Console.Out);
 
                 Console.WriteLine(mail.Body);
 
@@ -219,7 +230,7 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task GetTemplateAndApplyPlaceholdersWithSections()
         {
-            var template = await MailTemplate.FetchAsync(TEST_TEMPLATE_ID_SECTIONS);
+            var template = await _mailTemplateHelper.FetchAsync(TEST_TEMPLATE_ID_SECTIONS);
 
             if (template?.ID > 0)
             {
@@ -233,7 +244,7 @@ namespace Sushi.MailTemplate.Tests
                 
                 template.OptionalSections.Add("OPTIONALSECTION");
 
-                var mail = await MailTemplate.ApplyPlaceholdersAsync(template, Console.Out);
+                var mail = await _mailTemplateHelper.ApplyPlaceholdersAsync(template, Console.Out);
 
                 Console.WriteLine(mail.Body);
 
@@ -248,7 +259,7 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task GetSectionTags()
         {
-            var mailTemplate = await MailTemplate.FetchAsync(TEST_TEMPLATE_ID_SECTIONS);
+            var mailTemplate = await _mailTemplateHelper.FetchAsync(TEST_TEMPLATE_ID_SECTIONS);
             var sections = Logic.PlaceholderLogic.GetSectionTags(mailTemplate.Body, logger: Console.Out);
             
             Assert.IsTrue(sections.Any());
@@ -257,8 +268,8 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task DeleteMailTemplate()
         {
-            var template = await MailTemplate.FetchAsync("TEMPLATE1");
-            var deleted = await Data.MailTemplate.DeleteAsync(new List<int> { template.ID });
+            var template = await _mailTemplateHelper.FetchAsync("TEMPLATE1");
+            var deleted = await _mailTemplateRepository.DeleteAsync(new List<int> { template.ID });
 
             Assert.IsTrue(deleted);
         }
@@ -266,7 +277,7 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task MailTemplateListFetchAll()
         {
-            var items = await Data.MailTemplateList.FetchAllAsync();
+            var items = await _mailTemplateListRepository.FetchAllAsync();
 
             Assert.IsTrue(items.Any());
         }
@@ -275,7 +286,7 @@ namespace Sushi.MailTemplate.Tests
         [TestMethod]
         public async Task FetchAllByIdentifiers()
         {
-            var mailTemplates = await Data.MailTemplate.FetchAllByIdentifiersAsync(TEST_TEMPLATES, false);
+            var mailTemplates = await _mailTemplateRepository.FetchAllByIdentifiersAsync(TEST_TEMPLATES, false);
 
             bool containsFirst = mailTemplates.Any(x => x.Identifier == TEST_TEMPLATE_ID);
             bool containsSecond = mailTemplates.Any(x => x.Identifier == TEST_TEMPLATE_ID_GROUPS);

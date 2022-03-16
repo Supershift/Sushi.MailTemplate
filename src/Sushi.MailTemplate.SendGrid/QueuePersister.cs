@@ -1,13 +1,16 @@
 ﻿using Azure.Storage.Queues;
+using Microsoft.Extensions.Azure;
 using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.SendGrid
 {
-    internal class QueuePersister
+    public class QueuePersister
     {
-        public QueuePersister(string connectionString)
+        private readonly QueueServiceClient _client;
+
+        public QueuePersister(IAzureClientFactory<QueueServiceClient> clientFactory)
         {
-            ConnectionString = connectionString;
+            _client = clientFactory.CreateClient(ServiceCollectionExtensions.StorageClientName);
         }
 
         public string ConnectionString { get; protected set; }
@@ -15,7 +18,7 @@ namespace Sushi.MailTemplate.SendGrid
 
         public async Task<QueueClient> GetQueueAsync(string name)
         {
-            var queue = new QueueClient(ConnectionString, name);
+            var queue = _client.GetQueueClient(name);
             await queue.CreateIfNotExistsAsync();
 
             return queue;

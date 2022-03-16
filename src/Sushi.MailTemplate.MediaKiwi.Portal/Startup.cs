@@ -6,6 +6,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Sushi.Mediakiwi;
+using Sushi.MailTemplate.Extensions;
+using Sushi.MailTemplate.SendGrid;
+using Sushi.MicroORM;
 
 namespace Sushi.MailTemplate.MediaKiwi.Portal
 {
@@ -28,6 +31,18 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
+
+            string databaseConnectionString = Configuration.GetConnectionString("datastore");
+            string azureConnectionString = Configuration.GetConnectionString("azurestore");
+
+            // add sushi micro orm            
+            services.AddMicroORM(databaseConnectionString);
+
+            // add mail templating
+            services.AddSushiMailTemplate();
+
+            // add sendgrid
+            services.AddSushiMailTemplateSendgrid(Configuration.GetSection("SendGrid"), azureConnectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,10 +60,6 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMediakiwi();
-
-            // initiate
-            // hook up the Mailer to the SendPreviewEmailEventHandler.SendPreviewEmail
-            _ = new Mailer(Configuration["EmailStorageAccount"], Configuration["EmailBlobContainer"], Configuration["EmailQueueName"], Configuration["SendGridAPIKey"]);
         }
     }
 }

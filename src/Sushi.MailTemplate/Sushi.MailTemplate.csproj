@@ -1,15 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup Label="Globals">
-    <SccProjectName>%24/Mediakiwi/Main/Core/Wim.Module.MailTemplate/Wim.Module.MailTemplate</SccProjectName>
-    <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
-    <SccAuxPath>https://dev.azure.com/supershift</SccAuxPath>
-    <SccLocalPath>.</SccLocalPath>
-  </PropertyGroup>
-
   <PropertyGroup>
-	<TargetFramework>net6.0</TargetFramework>
-	<Version>2.0.0</Version>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <Version>3.0.0-a</Version>
     <Authors>Supershift B.V.</Authors>
     <Company>Supershift B.V.</Company>
     <Description>This module creates mail templates with placeholder logic.</Description>
@@ -19,45 +11,13 @@
     <RepositoryUrl>https://github.com/Supershift/Sushi.MailTemplate</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath></OutputPath>
-    <DocumentationFile>Sushi.MailTemplate.xml</DocumentationFile>
+    <DocumentationFile>obj\Debug\Sushi.MailTemplate.xml</DocumentationFile>
+    <OutputPath>bin</OutputPath>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Sushi.MailTemplate.xml</DocumentationFile>
+    <DocumentationFile>obj\Release\Sushi.MailTemplate.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="packages\**" />
-    <Compile Remove="UI\**" />
-    <Compile Remove="Wim.Module.MailTemplate.Contracts\**" />
-    <Compile Remove="Wim.Module.MailTemplate.Test\**" />
-    <Compile Remove="Wim.Module.MailTemplate.UI\**" />
-    <Compile Remove="_Properties\**" />
-    <EmbeddedResource Remove="packages\**" />
-    <EmbeddedResource Remove="UI\**" />
-    <EmbeddedResource Remove="Wim.Module.MailTemplate.Contracts\**" />
-    <EmbeddedResource Remove="Wim.Module.MailTemplate.Test\**" />
-    <EmbeddedResource Remove="Wim.Module.MailTemplate.UI\**" />
-    <EmbeddedResource Remove="_Properties\**" />
-    <None Remove="packages\**" />
-    <None Remove="UI\**" />
-    <None Remove="Wim.Module.MailTemplate.Contracts\**" />
-    <None Remove="Wim.Module.MailTemplate.Test\**" />
-    <None Remove="Wim.Module.MailTemplate.UI\**" />
-    <None Remove="_Properties\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Properties\AssemblyInfo.cs" />
-  </ItemGroup>  
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Sushi.MicroORM" Version="2.0.0" />
   </ItemGroup>

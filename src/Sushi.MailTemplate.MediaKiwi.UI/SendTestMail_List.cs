@@ -3,6 +3,8 @@ using System.Linq;
 using Sushi.MailTemplate.Entities;
 using System.Threading.Tasks;
 using Sushi.Mediakiwi.Framework;
+using Sushi.MailTemplate.Data;
+using Sushi.MailTemplate.Logic;
 
 namespace Sushi.MailTemplate.MediaKiwi.UI
 {
@@ -11,6 +13,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
     /// </summary>
     public class SendTestMail_List : ComponentListTemplate
     {
+        private readonly MailTemplateRepository _mailTemplateRepository;
+        private readonly PlaceholderLogic _placeholderLogic;
+        private readonly ISendPreviewEmailEventHandler _sendPreviewEmailEventHandler;
+
         /// <summary>
         /// 
         /// </summary>
@@ -18,7 +24,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// <summary>
         /// SendTestMail_List ctor
         /// </summary>
-        public SendTestMail_List()
+        public SendTestMail_List(MailTemplateRepository mailTemplateRepository, PlaceholderLogic placeholderLogic,  ISendPreviewEmailEventHandler sendPreviewEmailEventHandler = null)
         {
             wim.OpenInEditMode = true;
             wim.CanContainSingleInstancePerDefinedList = true;
@@ -27,6 +33,9 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             ListLoad += SendTestMail_List_ListLoad;
             ListSave += SendTestMail_List_ListSave;
             ListPreRender += SendTestMail_List_ListPreRender;
+            _mailTemplateRepository = mailTemplateRepository;
+            _placeholderLogic = placeholderLogic;
+            _sendPreviewEmailEventHandler = sendPreviewEmailEventHandler;
         }
 
         private async Task SendTestMail_List_ListPreRender(ComponentListEventArgs e)
@@ -34,7 +43,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             var idQueryString = Request.Query["item"].ToString();
 
             int.TryParse(idQueryString, out int id);
-            var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
+            var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
             EmailFrom = EmailFrom ?? mailTemplate.DefaultSenderEmail;
             EmailTo = EmailTo ?? wim.CurrentApplicationUser.Email;
 
@@ -58,7 +67,14 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// <param name="id"></param>
         public async Task SendTestMailAsync(int id)
         {
-            var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
+            if (_sendPreviewEmailEventHandler == null)
+            {   
+                wim.CurrentVisitor.Data.Apply("wim.note", $"No implementation for {nameof(ISendPreviewEmailEventHandler)} supplied, cannot send test mail");
+                await wim.CurrentVisitor.SaveAsync();
+                return;
+            }
+
+            var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
 
             var placeholderSubject = CreatePlaceholderObject(mailTemplate.Subject);
             var placeholderBody = CreatePlaceholderObject(mailTemplate.Body);
@@ -67,7 +83,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             var sectionBody = CreateSectionObject(mailTemplate.Body);
 
-            mailTemplate = await Logic.PlaceholderLogic.ApplyPlaceholdersAsync(mailTemplate, placeholderGroupBody, placeholderBody, sectionBody);
+            mailTemplate = await _placeholderLogic.ApplyPlaceholdersAsync(mailTemplate, placeholderGroupBody, placeholderBody, sectionBody);
 
             var body = mailTemplate.Body;
             var subject = mailTemplate.Subject;
@@ -80,9 +96,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 return;
             }
 
+            
             var e = new Logic.SendPreviewEmailEventArgs { EmailFrom = EmailFrom, EmailTo = EmailTo, Subject = subject, Body = body, TemplateName = mailTemplate.Identifier, EmailFromName = mailTemplate.DefaultSenderName };
-            var handler = new Logic.SendPreviewEmailEventHandler();
-            await handler.OnSendPreviewEmailAsync(e);
+            
+            await _sendPreviewEmailEventHandler.SendPreviewEmailAsync(e);
 
             if (e.IsSuccess)
             {
@@ -105,7 +122,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             int.TryParse(idQueryString, out int id);
 
-            var mailTemplate = await Data.MailTemplate.FetchSingleAsync(id);
+            var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
 
             var placeholdersSubject = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Subject);
             foreach (var placeholder in placeholdersSubject)

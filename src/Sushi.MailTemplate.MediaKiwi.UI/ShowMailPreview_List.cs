@@ -1,4 +1,5 @@
-﻿using Sushi.Mediakiwi.Framework;
+﻿using Sushi.MailTemplate.Data;
+using Sushi.Mediakiwi.Framework;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -9,14 +10,17 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
     /// </summary>
     public class ShowMailPreview_List : ComponentListTemplate
     {
+        private readonly MailTemplateRepository _mailTemplateRepository;
+
         /// <summary>
         /// ShowMailPreview_List ctor
         /// </summary>
-        public ShowMailPreview_List()
+        public ShowMailPreview_List(Data.MailTemplateRepository mailTemplateRepository)
         {
             wim.CanContainSingleInstancePerDefinedList = true;
             wim.OpenInEditMode = true;
             ListLoad += ShowMailPreview_ListLoad;
+            _mailTemplateRepository = mailTemplateRepository;
         }
 
         private async Task ShowMailPreview_ListLoad(ComponentListEventArgs e)
@@ -24,7 +28,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             var mailTemplateKey = Context.Request.Query["MailTemplateID"].ToString();
             if (!string.IsNullOrEmpty(mailTemplateKey))
             {
-                var mailTemplate = await Data.MailTemplate.FetchSingleAsync(int.Parse(mailTemplateKey));
+                var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(int.Parse(mailTemplateKey));
 
                 var body = HttpUtility.HtmlDecode(mailTemplate.Body);
 

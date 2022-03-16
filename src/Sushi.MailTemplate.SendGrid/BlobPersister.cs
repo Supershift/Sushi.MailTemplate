@@ -1,25 +1,24 @@
 ﻿using Azure.Storage.Blobs;
+using Microsoft.Extensions.Azure;
 using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.SendGrid
 {
-    internal class BlobPersister
-
+    public class BlobPersister
     {
-        public BlobPersister(string connectionString)
+        private readonly BlobServiceClient _client;
+
+        public BlobPersister(IAzureClientFactory<BlobServiceClient> clientFactory)
         {
-            ConnectionString = connectionString;
+            _client = clientFactory.CreateClient(ServiceCollectionExtensions.StorageClientName);
         }
 
-        public string ConnectionString { get; protected set; }
-
-        public async Task<BlobClient> GetBlockBlobReferenceAsync(string containerName, string blobName)
+        public async Task<BlobClient> GetBlobClientAsync(string containerName, string blobName)
         {
-            var storageAccount = new BlobContainerClient(ConnectionString, containerName);
-            await storageAccount.CreateIfNotExistsAsync();
-
-            // Create the blob client.
-            var blobClient = storageAccount.GetBlobClient(blobName);
+            var container = _client.GetBlobContainerClient(containerName);
+            await container.CreateIfNotExistsAsync();
+            
+            var blobClient = container.GetBlobClient(blobName);
             return blobClient;
         }
     }
