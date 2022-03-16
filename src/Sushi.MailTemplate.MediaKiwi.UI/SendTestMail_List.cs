@@ -97,7 +97,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             }
 
             
-            var e = new Logic.SendPreviewEmailEventArgs { EmailFrom = EmailFrom, EmailTo = EmailTo, Subject = subject, Body = body, TemplateName = mailTemplate.Identifier, EmailFromName = mailTemplate.DefaultSenderName };
+            var e = new SendPreviewEmailEventArgs { EmailFrom = EmailFrom, EmailTo = EmailTo, MailTemplate = mailTemplate, EmailFromName = mailTemplate.DefaultSenderName };
             
             await _sendPreviewEmailEventHandler.SendPreviewEmailAsync(e);
 
