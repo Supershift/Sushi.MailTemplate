@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Sushi.MailTemplate.Logic;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using SG = SendGrid;
@@ -118,13 +119,13 @@ namespace Sushi.MailTemplate.SendGrid
                 throw new ApplicationException("SendGridAPIKey is empty");
             }
 
-            string emailFrom = email.From;
+            string emailFrom = email.From?.Trim();
             string emailFromName = HttpUtility.HtmlDecode(email.FromName);
-            string emailTo = email.To;
+            string emailTo = email.To?.Trim();
             string subject = email.Subject; // already encoded in apply placeholders
             string body = email.Body; // already encoded in apply placeholders
             string bccs = email.Bccs;
-            string templateName = email.TemplateName;
+            
             Guid? customerGuid = email.CustomerGUID;
 
             var client = new SG.SendGridClient(_sendGridMailerOptions.ApiKey);
@@ -139,9 +140,18 @@ namespace Sushi.MailTemplate.SendGrid
 
             if (!string.IsNullOrWhiteSpace(bccs))
             {
-                foreach (var bcc in bccs.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+                var bccAddresses = bccs.Split(';', StringSplitOptions.RemoveEmptyEntries).Distinct();
+                
+                foreach (var bcc in bccAddresses)
                 {
-                    message.AddBcc(new SG.Helpers.Mail.EmailAddress(bcc));
+                    // remove whitespace at start/end
+                    string bccAddress = bcc.Trim();
+
+                    // make sure it is not same as 'email to', because than it will be rejected by sendgrid
+                    if (bccAddress.Equals(emailTo, StringComparison.InvariantCultureIgnoreCase))
+                        continue;
+                    
+                    message.AddBcc(new SG.Helpers.Mail.EmailAddress(bccAddress));
                 }
             }
 
