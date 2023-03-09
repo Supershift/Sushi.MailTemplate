@@ -77,8 +77,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             if (result != null && result.ID != Implement.ID)
             {
-                Notification.InsertOne("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
-                return Task.CompletedTask;
+                throw new System.Exception($"Identifier {Identifier} is already in use.");
             }
 
             var id = Implement.Save(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email);
@@ -122,8 +121,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
                 if (result != null && result.ID != Implement.ID)
                 {
-                    Notification.InsertOne("Wim.Module.MailTemplate", $"Identifier {Identifier} is already in use.");
-                    return Task.CompletedTask;
+                    throw new System.Exception($"Identifier {Identifier} is already in use.");
                 }
 
                 if (Implement.Publish(wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email))

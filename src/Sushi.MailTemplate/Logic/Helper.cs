@@ -164,7 +164,6 @@ namespace Sushi.MailTemplate.Logic
 
                     if (logger != null)
                         logger.WriteLine($"Not valid: {match.Value}");
-                    //Wim.Data.Notification.InsertOne("Wim.Module.MailTemplate", $"{match.Value} is not a valid placeholder.");
                     isValid = false;
                 }
             }

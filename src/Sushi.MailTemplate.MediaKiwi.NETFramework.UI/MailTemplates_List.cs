@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Wim.Framework;
+using Sushi.MediaKiwi.Framework;
 
 namespace Sushi.MailTemplate.MediaKiwi.UI.MK
 {

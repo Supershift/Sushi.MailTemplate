@@ -41,63 +41,47 @@ namespace Sushi.MailTemplate.MediaKiwi.Portal
 
         private void OnSendPreviewEmail(object sender, Sushi.MailTemplate.Logic.SendPreviewEmailEventArgs e)
         {
-            try
-            {
-                var emailFrom = e.EmailFrom;
-                var emailTo = e.EmailTo;
-                var subject = e.Subject;
-                var body = e.Body;
-                var templateName = e.TemplateName;
+            var emailFrom = e.EmailFrom;
+            var emailTo = e.EmailTo;
+            var subject = e.Subject;
+            var body = e.Body;
+            var templateName = e.TemplateName;
 
-                var mail = new Sushi.MailTemplate.Data.MailTemplate
-                {
-                    DefaultSenderEmail = emailFrom,
-                    DefaultSenderName = $"{e.EmailFromName} - Preview",
-                    Subject = subject,
-                    Body = body,
-                    Identifier = templateName
-                };
-
-                var mailer = new Sushi.MailTemplate.SendGrid.Mailer(EmailStorageAccount, EmailBlobContainer, EmailQueueName);
-                e.IsSuccess = mailer.QueueMail(mail, emailTo, customerGUID: Guid.NewGuid());
-            }
-            catch (Exception ex)
+            var mail = new Sushi.MailTemplate.Data.MailTemplate
             {
-                Notification.InsertOne("MailTemplate.SendMail", ex.ToString());
-                e.IsSuccess = false;
-            }
+                DefaultSenderEmail = emailFrom,
+                DefaultSenderName = $"{e.EmailFromName} - Preview",
+                Subject = subject,
+                Body = body,
+                Identifier = templateName
+            };
+
+            var mailer = new Sushi.MailTemplate.SendGrid.Mailer(EmailStorageAccount, EmailBlobContainer, EmailQueueName);
+            e.IsSuccess = mailer.QueueMail(mail, emailTo, customerGUID: Guid.NewGuid());
         }
         private async Task OnSendPreviewEmailAsync(object sender, Sushi.MailTemplate.Logic.SendPreviewEmailEventArgs e)
         {
-            try
+            var emailFrom = e.EmailFrom;
+            var emailTo = e.EmailTo;
+            var subject = e.Subject;
+            var body = e.Body;
+            var templateName = e.TemplateName;
+
+            var mailTemplate = MailTemplate.Fetch(templateName);
+
+            var mailer = new Sushi.MailTemplate.SendGrid.Mailer(EmailStorageAccount, EmailBlobContainer, EmailQueueName, SendGridAPIKey);
+
+            var emailToSend = new Email
             {
-                var emailFrom = e.EmailFrom;
-                var emailTo = e.EmailTo;
-                var subject = e.Subject;
-                var body = e.Body;
-                var templateName = e.TemplateName;
+                From = emailFrom,
+                FromName = mailTemplate.DefaultSenderName,
+                TemplateName = templateName,
+                Body = body,
+                Subject = subject,
+                To = emailTo
+            };
 
-                var mailTemplate = MailTemplate.Fetch(templateName);
-
-                var mailer = new Sushi.MailTemplate.SendGrid.Mailer(EmailStorageAccount, EmailBlobContainer, EmailQueueName, SendGridAPIKey);
-
-                var emailToSend = new Email
-                {
-                    From = emailFrom,
-                    FromName = mailTemplate.DefaultSenderName,
-                    TemplateName = templateName,
-                    Body = body,
-                    Subject = subject,
-                    To = emailTo
-                };
-
-                e.IsSuccess = await mailer.SendMailAsync(emailToSend);
-            }
-            catch (Exception ex)
-            {
-                Notification.InsertOne("MailTemplate.SendMail", ex.ToString());
-                e.IsSuccess = false;
-            }
+            e.IsSuccess = await mailer.SendMailAsync(emailToSend);
         }
 
     }
