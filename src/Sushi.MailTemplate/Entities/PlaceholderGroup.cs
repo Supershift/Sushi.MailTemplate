@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.Entities
 {
@@ -18,6 +15,7 @@ namespace Sushi.MailTemplate.Entities
         {
 
         }
+
         /// <summary>
         /// PlaceholderGroup ctor
         /// </summary>
@@ -26,10 +24,12 @@ namespace Sushi.MailTemplate.Entities
         {
             Name = name;
         }
+
         /// <summary>
         /// The name of the placeholder group
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// Adds a new row to the placeholder group
         /// </summary>
@@ -47,13 +47,15 @@ namespace Sushi.MailTemplate.Entities
         {
             PlaceholderRows.Last().Placeholders.Add(new Placeholder { Name = placeholder, Value = value });
         }
+
         /// <summary>
         /// List of placeholder rows
         /// </summary>
-        public List<PlaceholderRow> PlaceholderRows { get; set; } = new List<PlaceholderRow>();
+        public List<PlaceholderRow> PlaceholderRows { get; set; } = [];
+
         /// <summary>
         /// List of placeholder tags
         /// </summary>
-        public List<string> PlaceholderTags { get; set; } = new List<string>();
+        public List<string> PlaceholderTags { get; set; } = [];
     }
 }

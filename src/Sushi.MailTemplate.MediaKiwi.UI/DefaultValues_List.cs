@@ -87,10 +87,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     {
                         if (defaultValue.ID < 0 && !string.IsNullOrEmpty(defaultValue.Value))
                         {
-                            if (mailTemplate == null)
-                            {
-                                mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
-                            }
+                            mailTemplate ??= await _mailTemplateRepository.FetchSingleAsync(id);
 
                             // create
                             defaultValue.ID = 0;

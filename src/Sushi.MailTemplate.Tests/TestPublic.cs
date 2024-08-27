@@ -5,7 +5,6 @@ using Sushi.MailTemplate.Extensions;
 using Sushi.MailTemplate.SendGrid;
 using Sushi.MicroORM;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -269,7 +268,7 @@ namespace Sushi.MailTemplate.Tests
         public async Task DeleteMailTemplate()
         {
             var template = await _mailTemplateHelper.FetchAsync("TEMPLATE1");
-            var deleted = await _mailTemplateRepository.DeleteAsync(new List<int> { template.ID });
+            var deleted = await _mailTemplateRepository.DeleteAsync([template.ID]);
 
             Assert.IsTrue(deleted);
         }

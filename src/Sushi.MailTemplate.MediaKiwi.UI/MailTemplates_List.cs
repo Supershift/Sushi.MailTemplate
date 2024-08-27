@@ -1,7 +1,6 @@
 ﻿using Sushi.Mediakiwi.Data;
 using Sushi.Mediakiwi.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.MediaKiwi.UI
@@ -20,7 +19,6 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         public MailTemplates_List(Data.MailTemplateRepository mailTemplateRepository, Data.MailTemplateListRepository mailTemplateListRepository)
         {
             wim.OpenInEditMode = false;
-            //wim.CurrentList.Option_AfterSaveListView = false;
 
             ListSearch += MailTemplatesList_ListSearch;
             ListLoad += MailTemplatesList_ListLoad;
@@ -41,7 +39,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
         private async Task<bool> CanSaveAsync()
         {
-            if (Implement == null) Implement = new Data.MailTemplate();
+            Implement ??= new Data.MailTemplate();
             Utility.ReflectProperty(this, Implement, true);
 
             if (string.IsNullOrWhiteSpace(Implement.Identifier))
@@ -85,10 +83,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             var id = await _mailTemplateRepository.SaveAsync(Implement, wim.CurrentApplicationUser.ID, wim.CurrentApplicationUser.Displayname, wim.CurrentApplicationUser.Email);
 
-            Response.Redirect(wim.GetUrl(new KeyValue[] {
-                        new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
-                        new KeyValue { Key = "item", Value = id }
-            }));
+            Response.Redirect(wim.GetUrl(
+                new KeyValue { Key = "list", Value = wim.CurrentList.ID },
+                new KeyValue { Key = "item", Value = id }
+            ));
         }
 
         private async Task MailTemplatesList_ListAction(ComponentActionEventArgs e)
@@ -129,10 +127,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                     wim.CurrentVisitor.Data.Apply("wim.note", "Template is published", null);
                     await wim.CurrentVisitor.SaveAsync();
 
-                    Response.Redirect(wim.GetUrl(new KeyValue[] {
+                    Response.Redirect(wim.GetUrl(
                         new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
                         new KeyValue { Key = "item", Value = Implement.ID }
-                    }));
+                    ));
                 }
             }
 
@@ -140,10 +138,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             {
                 wim.Notification.AddNotificationAlert($"Template has been reverted to the published version", true);
 
-                Response.Redirect(wim.GetUrl(new KeyValue[] {
-                        new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
-                        new KeyValue { Key = "item", Value = Implement.ID }
-                    }));
+                Response.Redirect(wim.GetUrl(
+                    new KeyValue { Key = "list", Value = wim.CurrentList.ID },
+                    new KeyValue { Key = "item", Value = Implement.ID }
+                ));
             }
         }
 
@@ -168,10 +166,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 if (latestTemplate != null && Implement.ID != latestTemplate.ID)
                 {
                     // someone is using the url to go to an old template, redirect to newest
-                    Response.Redirect(wim.GetUrl(new KeyValue[] {
-                        new KeyValue { Key = "list", Value =  wim.CurrentList.ID},
+                    Response.Redirect(wim.GetUrl(
+                        new KeyValue { Key = "list", Value = wim.CurrentList.ID },
                         new KeyValue { Key = "item", Value = latestTemplate.ID }
-                    }));
+                    ));
                 }
 
                 if (e.SelectedKey > 0)
@@ -193,7 +191,6 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             wim.SetPropertyVisibility(nameof(BtnPublish), !(Implement.IsPublished.HasValue && Implement.IsPublished.Value));
             wim.SetPropertyVisibility(nameof(BtnPreview), !wim.IsEditMode);
             wim.SetPropertyVisibility(nameof(BtnSendTestMail), !wim.IsEditMode);
-            //wim.SetPropertyVisibility(nameof(BtnDefaultValues), !wim.IsEditMode);
             // not working yet, so invisible
             wim.SetPropertyVisibility(nameof(BtnDefaultValues), false);
 
@@ -242,14 +239,12 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             get
             {
                 var list = ComponentList.SelectOne(typeof(DefaultValues_List));
-                //return Wim.Data.Standard.Utility.AddApplicationPath($@"repository/wim/portal.ashx?list={list.ID}&item={Implement.ID}&openinframe=1");
+
                 return wim.GetUrl(
-                    new KeyValue[] {
-                        new KeyValue { Key = "list",  Value = list.ID },
-                        new KeyValue { Key = "item", Value = Implement.ID },
-                        new KeyValue { Key = "openinframe", Value = "1" },
-                    }
-                    );
+                    new KeyValue { Key = "list", Value = list.ID },
+                    new KeyValue { Key = "item", Value = Implement.ID },
+                    new KeyValue { Key = "openinframe", Value = "1" }
+                );
             }
         }
 
@@ -304,13 +299,11 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             {
                 var list = ComponentList.SelectOne(typeof(ShowMailPreview_List));
                 return wim.GetUrl(
-                    new KeyValue[] {
-                        new KeyValue { Key = "list",  Value = list.ID },
-                        new KeyValue { Key = "MailTemplateID", Value = Implement.ID },
-                        new KeyValue { Key = "state", Value = "1" },
-                        new KeyValue { Key = "openinframe", Value = "1" },
-                    }
-                    );
+                    new KeyValue { Key = "list", Value = list.ID },
+                    new KeyValue { Key = "MailTemplateID", Value = Implement.ID },
+                    new KeyValue { Key = "state", Value = "1" },
+                    new KeyValue { Key = "openinframe", Value = "1" }
+                );
             }
         }
 
@@ -324,12 +317,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
                 int? list = ComponentList.SelectOne(type: typeof(SendTestMail_List))?.ID;
 
                 return wim.GetUrl(
-                    new KeyValue[] {
-                        new KeyValue { Key = "list",  Value = list.HasValue ? list.Value : 0 },
-                        new KeyValue { Key = "importtype", Value = "open" },
-                        new KeyValue { Key = "openinframe", Value = "1" },
-                    }
-                    );
+                    new KeyValue { Key = "list", Value = list.HasValue ? list.Value : 0 },
+                    new KeyValue { Key = "importtype", Value = "open" },
+                    new KeyValue { Key = "openinframe", Value = "1" }
+                );
             }
         }
         /// <summary>

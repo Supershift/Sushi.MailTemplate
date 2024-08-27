@@ -1,8 +1,5 @@
 ﻿using Sushi.MicroORM;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.Data
@@ -15,26 +12,26 @@ namespace Sushi.MailTemplate.Data
         {
             _connector = connector;
         }
-        
+
         /// <summary>
         /// Fetch all mail templates
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         public async Task<List<MailTemplateList>> FetchAllAsync(string name = "")
-        {   
-            var filter = _connector.CreateQuery();
+        {
+            var query = _connector.CreateQuery();
 
-            filter.AddOrder(x => x.Name);
+            query.AddOrder(x => x.Name);
 
             if (!string.IsNullOrEmpty(name))
             {
                 string searchLike = $"%{name}%";
-                filter.AddSql($"(MailTemplate_Name LIKE @searchLike OR MailTemplate_Identifier LIKE @searchLike)");
-                filter.AddParameter("@searchLike", System.Data.SqlDbType.NVarChar, searchLike);
+                query.AddSql($"(MailTemplate_Name LIKE @searchLike OR MailTemplate_Identifier LIKE @searchLike)");
+                query.AddParameter("@searchLike", System.Data.SqlDbType.NVarChar, searchLike);
             }
 
-            var result = await _connector.FetchAllAsync(filter);
+            var result = await _connector.GetAllAsync(query);
 
             return result;
         }
@@ -44,11 +41,11 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public async new Task<MailTemplateList> FetchSingleByIdentifierAsync(string identifier)
-        {   
-            var filter = _connector.CreateQuery();
-            filter.Add(x => x.Identifier, identifier, ComparisonOperator.Like);
-            var result = await _connector.FetchSingleAsync(filter);
+        public async Task<MailTemplateList> FetchSingleByIdentifierAsync(string identifier)
+        {
+            var query = _connector.CreateQuery();
+            query.Add(x => x.Identifier, identifier, ComparisonOperator.Like);
+            var result = await _connector.GetFirstAsync(query);
             return result;
         }
 
@@ -57,9 +54,12 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async new Task<MailTemplateList> FetchSingleAsync(int id)
-        {   
-            var result = await _connector.FetchSingleAsync(id);
+        public async Task<MailTemplateList> FetchSingleAsync(int id)
+        {
+            var query = _connector.CreateQuery();
+            query.Add(x => x.ID, id);
+
+            var result = await _connector.GetFirstAsync(query);
             return result;
         }
     }

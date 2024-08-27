@@ -13,6 +13,18 @@ namespace Sushi.MailTemplate.Logic
     /// </summary>
     public class PlaceholderLogic
     {
+
+        internal const string PatternSection = @"\[section:.+?\].+?\[/section:.+?\]";
+        internal const string PatternGroup = @"\[g:.+?\].+?\[/g:.+?\]";
+
+        /// <summary>
+        /// Pattern searches for [, then a character in A-Z or 0-9, ending with ]
+        /// Matches [T], [TEST123]
+        /// </summary>
+        internal const string Pattern = @"\[[A-Z0-9]*?\]";
+        private readonly Data.MailTemplateListRepository _mailTemplateListRepository;
+        private readonly Data.DefaultValuePlaceholderRepository _defaultValuePlaceholderRepository;
+
         // PlaceholderTag = [NAME]
         // PlaceholderReplacer = [PlaceholderTagName, PlaceholderValue]
         // PlaceholderValue = "Pietje Puk"
@@ -24,17 +36,6 @@ namespace Sushi.MailTemplate.Logic
             _mailTemplateListRepository = mailTemplateListRepository;
             _defaultValuePlaceholderRepository = defaultValuePlaceholderRepository;
         }
-
-        internal const string PatternSection = @"\[section:.+?\].+?\[/section:.+?\]";
-        internal const string PatternGroup = @"\[g:.+?\].+?\[/g:.+?\]";
-
-        /// <summary>
-        /// Pattern searches for [, then a character in A-Z or 0-9, ending with ] 
-        /// Matches [T], [TEST123]
-        /// </summary>
-        internal const string Pattern = @"\[[A-Z0-9]*?\]";
-        private readonly Data.MailTemplateListRepository _mailTemplateListRepository;
-        private readonly Data.DefaultValuePlaceholderRepository _defaultValuePlaceholderRepository;
 
         /// <summary>
         /// Provide a mail template ID, placeholder group replacements, placeholder replacements and optional sections to include
@@ -73,10 +74,10 @@ namespace Sushi.MailTemplate.Logic
                 return string.Empty;
             }
 
-            if (placeholderGroupReplacements == null) placeholderGroupReplacements = new List<PlaceholderGroup>();
-            if (placeholderReplacements == null) placeholderReplacements = new List<Placeholder>();
-            if (listOfDefaultValues == null) listOfDefaultValues = new List<Data.DefaultValuePlaceholder>();
-            if (optionalSectionsToInclude == null) optionalSectionsToInclude = new List<string>();
+            placeholderGroupReplacements ??= [];
+            placeholderReplacements ??= [];
+            listOfDefaultValues ??= [];
+            optionalSectionsToInclude ??= [];
 
             var result = textWithPlaceholderTags;
 
@@ -137,8 +138,7 @@ namespace Sushi.MailTemplate.Logic
                         {
                             if (replacedRow.IndexOf($"[{placeholder.Name}]", StringComparison.OrdinalIgnoreCase) > -1 && !placeholder.Name.Equals("unsubscribe", StringComparison.OrdinalIgnoreCase))
                             {
-                                if (logger != null)
-                                    logger.WriteLine($"replacing {placeholder.Name} with {placeholder.Value}");
+                                logger?.WriteLine($"replacing {placeholder.Name} with {placeholder.Value}");
                                 replacedRow = replacedRow.Replace($"[{placeholder.Name}]", placeholder.Value, StringComparison.OrdinalIgnoreCase);
                             }
 
@@ -166,8 +166,7 @@ namespace Sushi.MailTemplate.Logic
                 if (placeholder.Value != null && !placeholder.Name.Equals("unsubscribe", StringComparison.OrdinalIgnoreCase))
                 {
                     result = result.Replace($"[{placeholder.Name}]", placeholder.Value, StringComparison.OrdinalIgnoreCase);
-                    if (logger != null)
-                        logger.WriteLine($"replacing {placeholder.Name} with {placeholder.Value}");
+                    logger?.WriteLine($"replacing {placeholder.Name} with {placeholder.Value}");
                 }
             }
 
@@ -177,8 +176,7 @@ namespace Sushi.MailTemplate.Logic
             {
                 if (result.IndexOf($"[{defaultValue.Placeholder}]", StringComparison.OrdinalIgnoreCase) > -1 && !defaultValue.Placeholder.Equals("unsubscribe", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (logger != null)
-                        logger.WriteLine($"replacing {defaultValue.Placeholder} with {defaultValue.Value}");
+                    logger?.WriteLine($"replacing {defaultValue.Placeholder} with {defaultValue.Value}");
                     result = result.Replace($"[{defaultValue.Placeholder}]", defaultValue.Value, StringComparison.OrdinalIgnoreCase);
                 }
             }
@@ -243,9 +241,8 @@ namespace Sushi.MailTemplate.Logic
         {
             if (string.IsNullOrWhiteSpace(textWithSectionTags))
             {
-                if (logger != null)
-                    logger.WriteLine("Text with placeholder tags is empty");
-                return new List<string>();
+                logger?.WriteLine("Text with placeholder tags is empty");
+                return [];
             }
 
             var reg = new Regex(PatternSection, RegexOptions.IgnoreCase | RegexOptions.Singleline);
@@ -273,8 +270,7 @@ namespace Sushi.MailTemplate.Logic
                 }
             }
 
-            if (logger != null)
-                logger.WriteLine("({0} sections):", sectionList.Count);
+            logger?.WriteLine("({0} sections):", sectionList.Count);
 
             return sectionList;
 
@@ -291,9 +287,8 @@ namespace Sushi.MailTemplate.Logic
         {
             if (string.IsNullOrWhiteSpace(textWithPlaceholderTags))
             {
-                if (logger != null)
-                    logger.WriteLine("Text with placeholder tags is empty");
-                return new List<string>();
+                logger?.WriteLine("Text with placeholder tags is empty");
+                return [];
             }
 
             var reg = new Regex(Pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
@@ -320,8 +315,7 @@ namespace Sushi.MailTemplate.Logic
                 }
             }
 
-            if (logger != null)
-                logger.WriteLine("({0} placeholders):", placeholderList.Count);
+            logger?.WriteLine("({0} placeholders):", placeholderList.Count);
 
             return placeholderList;
 
@@ -338,9 +332,8 @@ namespace Sushi.MailTemplate.Logic
         {
             if (string.IsNullOrWhiteSpace(textWithPlaceholderTags))
             {
-                if (logger != null)
-                    logger.WriteLine("Text with placeholder tags is empty");
-                return new List<PlaceholderGroup>();
+                logger?.WriteLine("Text with placeholder tags is empty");
+                return [];
             }
 
             var regGroup = new Regex(PatternGroup, RegexOptions.IgnoreCase | RegexOptions.Singleline);
@@ -349,8 +342,7 @@ namespace Sushi.MailTemplate.Logic
 
             if (matchesGroup.Count > 0)
             {
-                if (logger != null)
-                    logger.WriteLine("({0} matches):", matchesGroup.Count);
+                logger?.WriteLine("({0} matches):", matchesGroup.Count);
                 foreach (Match match in matchesGroup)
                 {
                     var strippedGroup = StripBracketsFromGroup(match.Value);
@@ -374,8 +366,7 @@ namespace Sushi.MailTemplate.Logic
             var placeholderList = new List<string>();
             if (matchesGroup.Count > 0)
             {
-                if (logger != null)
-                    logger.WriteLine("({0} matches):", matchesGroup.Count);
+                logger?.WriteLine("({0} matches):", matchesGroup.Count);
                 foreach (Match match in matchesGroup)
                 {
                     placeholderList.Add(match.Value);
@@ -395,8 +386,7 @@ namespace Sushi.MailTemplate.Logic
             {
                 result = Helper.ReplaceLegacyUnsubscribe(result);
 
-                if (logger != null)
-                    logger.WriteLine($"replacing {unsubscribeStart} and {unsubscribeEnd} with <a href=\"[unsubscribe]\">...</a>");
+                logger?.WriteLine($"replacing {unsubscribeStart} and {unsubscribeEnd} with <a href=\"[unsubscribe]\">...</a>");
             }
 
             return result;

@@ -1,9 +1,7 @@
-﻿using Sushi.MicroORM;
-using Sushi.MicroORM.Mapping;
+﻿using Sushi.MicroORM.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.Data
 {
@@ -50,74 +48,92 @@ namespace Sushi.MailTemplate.Data
         /// The ID of the current mail template
         /// </summary>
         public int ID { get; set; }
+
         /// <summary>
         /// The name of the current mail template, which does not have to unique.
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// The description of the current mail template.
         /// </summary>
         public string Description { get; set; }
+
         /// <summary>
         /// The identifier of the current mail template, which is unique.
         /// </summary>
         public string Identifier { get; set; }
+
         /// <summary>
         /// The e-mail address of the sender of the e-mail
         /// </summary>
         public string DefaultSenderEmail { get; set; }
+
         /// <summary>
         /// The name of the sender of the e-mail
         /// </summary>
         public string DefaultSenderName { get; set; }
+
         /// <summary>
         /// The bcc receivers, as ";"-separated list, like info@supershift.com;support@supershift.nl
         /// </summary>
         public string BCCReceivers { get; set; }
+
         /// <summary>
         /// The e-mail subject
         /// </summary>
         public string Subject { get; set; }
+
         /// <summary>
         /// The e-mail body
         /// </summary>
         public string Body { get; set; }
+
         /// <summary>
         /// The date of creation of the current mail template.
         /// </summary>
         public DateTime? DateCreated { get; set; }
+
         /// <summary>
         /// The date of the last modification of the current mail template.
         /// </summary>
         public DateTime? DateLastUpdated { get; set; }
+
         /// <summary>
         /// Returns if the current mail template is archived.
         /// </summary>
         public bool? IsArchived { get; set; }
+
         /// <summary>
         /// Returns if the current mail template is published.
         /// </summary>
         public bool? IsPublished { get; set; }
+
         /// <summary>
         /// The major version like 2.x
         /// </summary>
         public int VersionMajor { get; set; }
+
         /// <summary>
         /// The minor verion like x.1
         /// </summary>
         public int VersionMinor { get; set; }
+
         /// <summary>
         /// The UserID of the creator
         /// </summary>
         public int? UserID { get; set; }
+
         /// <summary>
         /// The Username of the creator
         /// </summary>
         public string UserName { get; set; }
+
         /// <summary>
         /// The GUID of the current mail template
         /// </summary>
         public Guid GUID { get; set; }
+
         /// <summary>
         /// HasPublishedVersion property is true if the mail template has at least one major version
         /// </summary>
@@ -147,7 +163,7 @@ namespace Sushi.MailTemplate.Data
         /// Optional sections are useful for instance to create invitation mail templates with optional blocks for rooms, sunbeds and express checkins. 
         /// Leaving a section out has as result that the section is removed from the e-mail.
         /// </summary>
-        public List<string> OptionalSections { get; set; } = new List<string>();
+        public List<string> OptionalSections { get; set; } = [];
     }
 
     /// <summary>
@@ -155,7 +171,7 @@ namespace Sushi.MailTemplate.Data
     /// </summary>
     public class PlaceholderGroupList
     {
-        internal Dictionary<string, Entities.PlaceholderGroup> PlaceholderGroupDictionary { get; set; } = new Dictionary<string, Entities.PlaceholderGroup>();
+        internal Dictionary<string, Entities.PlaceholderGroup> PlaceholderGroupDictionary { get; set; } = [];
         
         /// <summary>
         /// Add a group to the placeholder groups, like template.PlaceholderGroupList.Add("rooms");
@@ -190,7 +206,7 @@ namespace Sushi.MailTemplate.Data
     /// </summary>
     public class PlaceholderList
     {
-        internal Dictionary<string, Entities.Placeholder> PlaceholderDictionary { get; set; } = new Dictionary<string, Entities.Placeholder>();
+        internal Dictionary<string, Entities.Placeholder> PlaceholderDictionary { get; set; } = [];
         
         /// <summary>
         /// Add name-value pairs to the placeholder list, like template.PlaceholderList.Add("NAME", "Cus Tomer");

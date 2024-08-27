@@ -1,7 +1,4 @@
-﻿using Sushi.MicroORM;
-using Sushi.MicroORM.Mapping;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Sushi.MicroORM.Mapping;
 
 namespace Sushi.MailTemplate.Data
 {
@@ -26,27 +23,27 @@ namespace Sushi.MailTemplate.Data
                 Map(x => x.MailTemplateID, "MailTemplateDefaultValuePlaceholder_MailTemplate_Key"); // DBType System.Int
                 Map(x => x.Placeholder, "MailTemplateDefaultValuePlaceholder_Placeholder"); // DBType System.String
                 Map(x => x.Value, "MailTemplateDefaultValuePlaceholder_Value"); // DBType System.String
-
             }
         }
+
         /// <summary>
         /// ID of the current default value
         /// </summary>
         public int ID { get; set; }
+
         /// <summary>
         /// GUID  of the current default value
         /// </summary>
         public int MailTemplateID { get; set; }
+
         /// <summary>
         /// Placeholder of the current default value
         /// </summary>
         public string Placeholder { get; set; }
+
         /// <summary>
         /// Value of the current default value
         /// </summary>
         public string Value { get; set; }
-
-        
-
     }
 }

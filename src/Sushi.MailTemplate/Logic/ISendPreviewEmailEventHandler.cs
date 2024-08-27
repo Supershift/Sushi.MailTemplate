@@ -14,7 +14,7 @@ namespace Sushi.MailTemplate.Logic
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public Task SendPreviewEmailAsync(SendPreviewEmailEventArgs e);        
+        public Task SendPreviewEmailAsync(SendPreviewEmailEventArgs e);
     }
 
     /// <summary>
@@ -48,6 +48,5 @@ namespace Sushi.MailTemplate.Logic
         /// Contains the error message when sending was not successful
         /// </summary>
         public string ErrorMessage { get; set; }
-
     }
 }
