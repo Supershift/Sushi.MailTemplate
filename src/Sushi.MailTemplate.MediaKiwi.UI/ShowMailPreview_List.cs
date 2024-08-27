@@ -15,7 +15,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// <summary>
         /// ShowMailPreview_List ctor
         /// </summary>
-        public ShowMailPreview_List(Data.MailTemplateRepository mailTemplateRepository)
+        public ShowMailPreview_List(MailTemplateRepository mailTemplateRepository)
         {
             wim.CanContainSingleInstancePerDefinedList = true;
             wim.OpenInEditMode = true;

@@ -1,22 +1,20 @@
 ﻿using Sushi.MicroORM;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.Data
 {
     public class MailTemplateRepository
     {
+        private readonly Connector<MailTemplate> _connector;
+        private readonly MailTemplateListRepository _mailTemplateListRepository;
+
         public MailTemplateRepository(Connector<MailTemplate> connector, MailTemplateListRepository mailTemplateListRepository)
         {
             _connector = connector;
             _mailTemplateListRepository = mailTemplateListRepository;
         }
-
-        private readonly Connector<MailTemplate> _connector;
-        private readonly MailTemplateListRepository _mailTemplateListRepository;
 
         /// <summary>
         /// Fetch a single mail template by id
@@ -25,8 +23,9 @@ namespace Sushi.MailTemplate.Data
         /// <returns></returns>
         public async Task<MailTemplate> FetchSingleAsync(int id)
         {
-            
-            var result = await _connector.FetchSingleAsync(id);
+            var query = _connector.CreateQuery();
+            query.Add(x => x.ID, id);
+            var result = await _connector.GetFirstAsync(query);
             return result;
         }
 
@@ -38,24 +37,25 @@ namespace Sushi.MailTemplate.Data
         /// <returns></returns>
         public async Task<List<MailTemplate>> FetchAllByIdentifiersAsync(IEnumerable<string> identifiers, bool onlyPublished = true)
         {
-            
-            var filter = _connector.CreateQuery();
-            filter.Add(x => x.Identifier, identifiers, ComparisonOperator.In);
+            var query = _connector.CreateQuery();
+            query.Add(x => x.Identifier, identifiers, ComparisonOperator.In);
 
             if (onlyPublished)
-                filter.Add(x => x.IsPublished, onlyPublished);
+            {
+                query.Add(x => x.IsPublished, onlyPublished);
+            }
 
-            var result = await _connector.FetchAllAsync(filter);
+            var result = await _connector.GetAllAsync(query);
             return result;
         }
 
         internal async Task<MailTemplate> FetchSingleAsync(string identifier, int versionMajor)
         {
-            
-            var filter = _connector.CreateQuery();
-            filter.Add(x => x.VersionMajor, versionMajor);
-            filter.Add(x => x.Identifier, identifier);
-            var result = await _connector.FetchSingleAsync(filter);
+            var query = _connector.CreateQuery();
+            query.Add(x => x.VersionMajor, versionMajor);
+            query.Add(x => x.Identifier, identifier);
+
+            var result = await _connector.GetFirstAsync(query);
             return result;
         }
 
@@ -68,26 +68,25 @@ namespace Sushi.MailTemplate.Data
         /// <returns></returns>
         internal async Task<MailTemplate> FetchSingleByIdentifierAsync(string identifier, bool onlyPublished)
         {
-            
-            var filter = _connector.CreateQuery();
-            filter.Add(x => x.Identifier, identifier);
+            var query = _connector.CreateQuery();
+            query.Add(x => x.Identifier, identifier);
             if (onlyPublished)
             {
-                filter.Add(x => x.IsPublished, true);
-                filter.Add(x => x.VersionMinor, 0);
+                query.Add(x => x.IsPublished, true);
+                query.Add(x => x.VersionMinor, 0);
             }
 
-            filter.AddOrder(x => x.VersionMajor, SortOrder.DESC);
-            var result = await _connector.FetchSingleAsync(filter);
+            query.AddOrder(x => x.VersionMajor, SortOrder.DESC);
+            var result = await _connector.GetFirstAsync(query);
             return result;
         }
 
         internal async Task<List<MailTemplate>> FetchAllByIdentifierAsync(string identifier)
         {
-            
-            var filter = _connector.CreateQuery();
-            filter.Add(x => x.Identifier, identifier);
-            var result = await _connector.FetchAllAsync(filter);
+            var query = _connector.CreateQuery();
+            query.Add(x => x.Identifier, identifier);
+
+            var result = await _connector.GetAllAsync(query);
             return result;
         }
 
@@ -105,7 +104,6 @@ namespace Sushi.MailTemplate.Data
                 mailTemplate.Body = Logic.Helper.ReplaceLegacyUnsubscribe(mailTemplate.Body);
                 mailTemplate.Subject = Logic.Helper.ReplaceLegacyUnsubscribe(mailTemplate.Subject);
 
-                
                 var currentTemplateInDatabase = await _mailTemplateListRepository.FetchSingleAsync(mailTemplate.ID);
                 var result = await _mailTemplateListRepository.FetchSingleByIdentifierAsync(mailTemplate.Identifier);
 
@@ -166,7 +164,6 @@ namespace Sushi.MailTemplate.Data
         /// <returns></returns>
         public async Task<bool> RevertAsync(MailTemplate mailTemplate, int userID, string userDisplayname, string userEmail)
         {
-            
             var result = await FetchSingleAsync(mailTemplate.Identifier, mailTemplate.VersionMajor);
 
             if (result != null && result.ID != mailTemplate.ID)
@@ -199,14 +196,12 @@ namespace Sushi.MailTemplate.Data
         {
             if (Logic.Helper.IsValidTemplate(mailTemplate.Body, mailTemplate.Subject))
             {
-                
-
                 // unpublish all previous
-                var filter = _connector.CreateQuery();
-                filter.AddParameter("@identifier", System.Data.SqlDbType.NVarChar, mailTemplate.Identifier);
-                var query = $@"UPDATE wim_MailTemplates SET MailTemplate_IsPublished = 0 WHERE MailTemplate_Identifier = @identifier";
+                var query = _connector.CreateQuery();
+                query.SqlQuery = $@"UPDATE wim_MailTemplates SET MailTemplate_IsPublished = 0 WHERE MailTemplate_Identifier = @identifier";
+                query.AddParameter("@identifier", System.Data.SqlDbType.NVarChar, mailTemplate.Identifier);
 
-                await _connector.ExecuteNonQueryAsync(query, filter);
+                await _connector.ExecuteNonQueryAsync(query);
 
                 // create new version
                 mailTemplate.VersionMajor++;
@@ -233,12 +228,11 @@ namespace Sushi.MailTemplate.Data
         /// <returns></returns>
         public async Task<bool> DeleteAsync(List<int> mailTemplateIDs)
         {
-            if (mailTemplateIDs != null && mailTemplateIDs.Count > 0)
+            if (mailTemplateIDs?.Count > 0)
             {
                 var joinedMailTemplateIDs = string.Join(",", mailTemplateIDs);
-
-                
-                var query = $@"UPDATE wim_MailTemplates SET MailTemplate_IsArchived = 1 WHERE MailTemplate_Key IN ({joinedMailTemplateIDs})";
+                var query = _connector.CreateQuery();
+                query.SqlQuery = $@"UPDATE wim_MailTemplates SET MailTemplate_IsArchived = 1 WHERE MailTemplate_Key IN ({joinedMailTemplateIDs})";
 
                 await _connector.ExecuteNonQueryAsync(query);
 

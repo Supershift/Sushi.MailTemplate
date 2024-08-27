@@ -1,7 +1,4 @@
-﻿using Sushi.MicroORM;
-using Sushi.MicroORM.Mapping;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Sushi.MicroORM.Mapping;
 
 namespace Sushi.MailTemplate.Data
 {
@@ -49,7 +46,6 @@ namespace Sushi.MailTemplate.Data
         /// </summary>
         public long? seqnum { get; set; }
 
-        
 
         /// <summary>
         /// Internal property for Mediakiwi to see if the record is selected

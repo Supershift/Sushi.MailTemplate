@@ -21,8 +21,6 @@ namespace Sushi.MailTemplate.SendGrid
         private readonly QueuePersister _queuePersister;
         private readonly SendGridMailerOptions _sendGridMailerOptions;
 
-
-
         /// <summary>
         /// Mailer Constructor
         /// </summary>
@@ -159,9 +157,11 @@ namespace Sushi.MailTemplate.SendGrid
             // then we also do not need to send the message id
             if (customerGuid.HasValue)
             {
-                message.CustomArgs = new System.Collections.Generic.Dictionary<string, string>();
-                message.CustomArgs.Add("CustomerGUID", customerGuid.ToString());
-                message.CustomArgs.Add("MessageGUID", email.ID.ToString());
+                message.CustomArgs = new System.Collections.Generic.Dictionary<string, string>
+                {
+                    { "CustomerGUID", customerGuid.ToString() },
+                    { "MessageGUID", email.ID.ToString() }
+                };
             }
 
             var result = await client.SendEmailAsync(message).ConfigureAwait(false);
@@ -235,9 +235,11 @@ namespace Sushi.MailTemplate.SendGrid
                 // then we also do not need to send the message id
                 if (customerGuid.HasValue)
                 {
-                    message.CustomArgs = new System.Collections.Generic.Dictionary<string, string>();
-                    message.CustomArgs.Add("CustomerGUID", customerGuid.ToString());
-                    message.CustomArgs.Add("MessageGUID", id);
+                    message.CustomArgs = new System.Collections.Generic.Dictionary<string, string>
+                    {
+                        { "CustomerGUID", customerGuid.ToString() },
+                        { "MessageGUID", id }
+                    };
                 }
 
                 var result = await client.SendEmailAsync(message).ConfigureAwait(false);

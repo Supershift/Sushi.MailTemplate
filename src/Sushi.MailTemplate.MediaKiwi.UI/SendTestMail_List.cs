@@ -21,6 +21,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         /// 
         /// </summary>
         public List<string> Errors { get; set; }
+
         /// <summary>
         /// SendTestMail_List ctor
         /// </summary>
@@ -44,8 +45,8 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             int.TryParse(idQueryString, out int id);
             var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
-            EmailFrom = EmailFrom ?? mailTemplate.DefaultSenderEmail;
-            EmailTo = EmailTo ?? wim.CurrentApplicationUser.Email;
+            EmailFrom ??= mailTemplate.DefaultSenderEmail;
+            EmailTo ??= wim.CurrentApplicationUser.Email;
 
             if (string.IsNullOrWhiteSpace(mailTemplate.Subject))
             {
@@ -68,7 +69,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         public async Task SendTestMailAsync(int id)
         {
             if (_sendPreviewEmailEventHandler == null)
-            {   
+            {
                 wim.CurrentVisitor.Data.Apply("wim.note", $"No implementation for {nameof(ISendPreviewEmailEventHandler)} supplied, cannot send test mail");
                 await wim.CurrentVisitor.SaveAsync();
                 return;
@@ -124,21 +125,21 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
             var mailTemplate = await _mailTemplateRepository.FetchSingleAsync(id);
 
-            var placeholdersSubject = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Subject);
+            var placeholdersSubject = PlaceholderLogic.GetPlaceholderTags(mailTemplate.Subject);
             foreach (var placeholder in placeholdersSubject)
             {
                 wim.Form.AddElement(this, placeholder, true, true,
                     new Mediakiwi.Framework.ContentListItem.TextFieldAttribute(placeholder, 4000, true));
             }
 
-            var placeholdersBody = Logic.PlaceholderLogic.GetPlaceholderTags(mailTemplate.Body);
+            var placeholdersBody = PlaceholderLogic.GetPlaceholderTags(mailTemplate.Body);
             foreach (var placeholder in placeholdersBody)
             {
                 wim.Form.AddElement(this, placeholder, true, true,
                     new Mediakiwi.Framework.ContentListItem.TextFieldAttribute(placeholder, 4000, true));
             }
 
-            var sections = Logic.PlaceholderLogic.GetSectionTags(mailTemplate.Body);
+            var sections = PlaceholderLogic.GetSectionTags(mailTemplate.Body);
             foreach (var section in sections)
             {
                 wim.Form.AddElement(this, section, true, true,
@@ -149,7 +150,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         private List<Placeholder> CreatePlaceholderObject(string textWithTags)
         {
             var result = new List<Placeholder>();
-            var placeholderTags = Logic.PlaceholderLogic.GetPlaceholderTags(textWithTags);
+            var placeholderTags = PlaceholderLogic.GetPlaceholderTags(textWithTags);
 
             foreach (var placeholderTag in placeholderTags)
             {
@@ -163,7 +164,7 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
         private List<string> CreateSectionObject(string textWithTags)
         {
             var result = new List<string>();
-            var sectionTags = Logic.PlaceholderLogic.GetSectionTags(textWithTags);
+            var sectionTags = PlaceholderLogic.GetSectionTags(textWithTags);
 
             foreach (var sectionTag in sectionTags)
             {
@@ -176,12 +177,10 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
 
         private List<PlaceholderGroup> CreatePlaceholderGroupsObject(string textWithTags)
         {
-            var placeholderGroups = Logic.PlaceholderLogic.GetPlaceholderGroupsWithPlaceholders(textWithTags);
+            var placeholderGroups = PlaceholderLogic.GetPlaceholderGroupsWithPlaceholders(textWithTags);
 
             foreach (var placeholderGroup in placeholderGroups)
             {
-                var placeholderReplacers = new Dictionary<string, List<string>>();
-
                 // repeat 3 times so the test e-mail has some content
                 for (int i = 0; i < 3; i++)
                 {
@@ -209,13 +208,15 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             {
                 foreach (var formKey in Request.Form.Keys.Where(x => x.EndsWith(fieldIdentifier)))
                 {
-                    string identifier = formKey.Split(new[] { '_' }, 2).LastOrDefault();
+                    string identifier = formKey.Split(['_'], 2).LastOrDefault();
                     if (!string.IsNullOrEmpty(identifier))
                     {
                         string value = Request.Form[formKey];
                         // for test purposes, if supplied with "null", make it a real null so testing with defaults is possible
-                        if (value.ToLower() == "null")
+                        if (value.Equals("null", System.StringComparison.OrdinalIgnoreCase))
+                        {
                             value = null;
+                        }
 
                         placeholders.Add(new Placeholder(identifier, value));
                     }
@@ -232,12 +233,13 @@ namespace Sushi.MailTemplate.MediaKiwi.UI
             {
                 foreach (var formKey in Request.Form.Keys.Where(x => x.EndsWith(fieldIdentifier)))
                 {
-                    string identifier = formKey.Split(new[] { '_' }, 2).LastOrDefault();
+                    string identifier = formKey.Split(['_'], 2).LastOrDefault();
                     if (!string.IsNullOrEmpty(identifier))
                     {
                         string value = Request.Form[formKey];
+
                         // a checkbox returns on
-                        if (value.ToLower() == "1")
+                        if (value.Equals("1", System.StringComparison.OrdinalIgnoreCase))
                         {
                             sections.Add(identifier);
                         }

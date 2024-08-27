@@ -1,8 +1,5 @@
 ﻿using Sushi.MicroORM;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sushi.MailTemplate.Data
@@ -15,13 +12,13 @@ namespace Sushi.MailTemplate.Data
         {
             _connector = connector;
         }
-        
+
         /// <summary>
         /// Saves the current default value
         /// </summary>
         /// <returns></returns>
         public async Task<int> SaveAsync(DefaultValuePlaceholder defaultValuePlaceholder)
-        {   
+        {
             await _connector.SaveAsync(defaultValuePlaceholder);
             return defaultValuePlaceholder.ID;
         }
@@ -30,7 +27,7 @@ namespace Sushi.MailTemplate.Data
         /// Deletes the current default value
         /// </summary>
         public async Task DeleteAsync(DefaultValuePlaceholder defaultValuePlaceholder)
-        {   
+        {
             await _connector.DeleteAsync(defaultValuePlaceholder);
         }
 
@@ -41,12 +38,12 @@ namespace Sushi.MailTemplate.Data
         /// <param name="mailTemplateIdentifier"></param>
         /// <returns></returns>
         public async Task<List<DefaultValuePlaceholder>> FetchAllByMailTemplateAsync(string mailTemplateIdentifier)
-        {  
-            var filter = _connector.CreateQuery();
-            filter.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
-            filter.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
+        {
+            var query = _connector.CreateQuery();
+            query.AddSql(@"EXISTS (SELECT NULL FROM wim_MailTemplates where MailTemplate_Identifier = @mailTemplateIdentifier)");
+            query.AddParameter("@mailTemplateIdentifier", mailTemplateIdentifier);
 
-            return await _connector.FetchAllAsync(filter);
+            return await _connector.GetAllAsync(query);
         }
     }
 }

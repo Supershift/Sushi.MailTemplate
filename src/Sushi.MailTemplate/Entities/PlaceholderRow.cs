@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Sushi.MailTemplate.Entities
 {
@@ -14,6 +10,6 @@ namespace Sushi.MailTemplate.Entities
         /// <summary>
         /// List of placeholders in this placeholder row
         /// </summary>
-        public List<Placeholder> Placeholders { get; set; } = new List<Placeholder>();
+        public List<Placeholder> Placeholders { get; set; } = [];
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Sushi.MailTemplate.Extensions;
 
 namespace Sushi.MailTemplate.Logic
 {
@@ -20,17 +16,12 @@ namespace Sushi.MailTemplate.Logic
 
         internal static bool IsPlaceholderGroup(string match)
         {
-            var isValid = (
-                match.StartsWith("[g:", StringComparison.OrdinalIgnoreCase)// placeholder group
-            );
-
-            return isValid;
+            return match.StartsWith("[g:", StringComparison.OrdinalIgnoreCase); // placeholder group
         }
+
         internal static bool IsPlaceholder(string match)
         {
-            var isValid = false;
-
-            isValid = (
+            return (
                 !match.StartsWith("[if", StringComparison.OrdinalIgnoreCase) && // conditional css
                 match.IndexOf("endif", StringComparison.OrdinalIgnoreCase) == -1 && // conditional css
                 !match.StartsWith("[g:", StringComparison.OrdinalIgnoreCase) && // placeholder group
@@ -38,8 +29,6 @@ namespace Sushi.MailTemplate.Logic
                 !match.StartsWith("[unsubscribe]", StringComparison.OrdinalIgnoreCase) && // unsubscribe
                 !match.StartsWith("[/unsubscribe]", StringComparison.OrdinalIgnoreCase) // unsubscribe
             );
-
-            return isValid;
         }
 
         internal static bool IsValidPlaceholder(string placeholder, System.IO.TextWriter logger)
@@ -54,8 +43,7 @@ namespace Sushi.MailTemplate.Logic
             {
                 //not just letters and digits.
                 isValid = false;
-                if (logger != null)
-                    logger.WriteLine($"{placeholder} contains more than alphanumeric characters.");
+                logger?.WriteLine($"{placeholder} contains more than alphanumeric characters.");
             }
 
             return isValid;
@@ -80,8 +68,7 @@ namespace Sushi.MailTemplate.Logic
             if (!openingTag.Equals(closingTag, StringComparison.OrdinalIgnoreCase))
             {
 
-                if (logger != null)
-                    logger.WriteLine($"Opening tag '{openingTag}' and closing tag '{closingTag}' are different.");
+                logger?.WriteLine($"Opening tag '{openingTag}' and closing tag '{closingTag}' are different.");
                 isValid = false;
             }
             else
@@ -91,8 +78,7 @@ namespace Sushi.MailTemplate.Logic
                     //not just letters and digits.
                     isValid = false;
 
-                    if (logger != null)
-                        logger.WriteLine($"{placeholderGroup} contains more than alphanumeric characters.");
+                    logger?.WriteLine($"{placeholderGroup} contains more than alphanumeric characters.");
                 }
             }
 
@@ -103,6 +89,7 @@ namespace Sushi.MailTemplate.Logic
 
             return isValid;
         }
+
         /// <summary>
         /// Validates a string with placeholder tags
         /// </summary>
@@ -125,28 +112,24 @@ namespace Sushi.MailTemplate.Logic
             return isValid;
         }
 
-        private static bool ValidateTextWithPlaceholderGroups(string textWithPlaceholderGroupTags, ref bool isValid, System.IO.TextWriter logger)
+        private static void ValidateTextWithPlaceholderGroups(string textWithPlaceholderGroupTags, ref bool isValid, System.IO.TextWriter logger)
         {
             var regGroup = new Regex(PlaceholderLogic.PatternGroup, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             var groupMatches = regGroup.Matches(textWithPlaceholderGroupTags);
             foreach (Match match in groupMatches)
             {
-                if (logger != null)
-                    logger.WriteLine($"Checking: {match.Value}");
+                logger?.WriteLine($"Checking: {match.Value}");
                 // if it is a placeholder group then check if it is valid
                 if (IsPlaceholderGroup(match.Value) && !IsValidPlaceholderGroup(match.Value, logger))
                 {
-                    if (logger != null)
-                        logger.WriteLine($"Not valid: {match.Value}");
+                    logger?.WriteLine($"Not valid: {match.Value}");
 
                     isValid = false;
                 }
             }
-
-            return isValid;
         }
 
-        private static bool ValidateTextWithPlaceholders(string textWithPlaceholderTags, ref bool isValid, System.IO.TextWriter logger)
+        private static void ValidateTextWithPlaceholders(string textWithPlaceholderTags, ref bool isValid, System.IO.TextWriter logger)
         {
             var pattern = PlaceholderLogic.Pattern;
 
@@ -156,20 +139,15 @@ namespace Sushi.MailTemplate.Logic
             foreach (Match match in matches)
             {
 
-                if (logger != null)
-                    logger.WriteLine($"Checking: {match.Value}");
+                logger?.WriteLine($"Checking: {match.Value}");
                 // if it is a placeholder then check if it is valid
                 if (IsPlaceholder(match.Value) && !IsValidPlaceholder(match.Value, logger))
                 {
 
-                    if (logger != null)
-                        logger.WriteLine($"Not valid: {match.Value}");
-                    //Wim.Data.Notification.InsertOne("Wim.Module.MailTemplate", $"{match.Value} is not a valid placeholder.");
+                    logger?.WriteLine($"Not valid: {match.Value}");
                     isValid = false;
                 }
             }
-
-            return isValid;
         }
 
         internal static string ReplaceLegacyUnsubscribe(string input)

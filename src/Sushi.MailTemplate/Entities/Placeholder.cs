@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sushi.MailTemplate.Entities
+﻿namespace Sushi.MailTemplate.Entities
 {
     /// <summary>
     /// Placeholder class
@@ -18,6 +12,7 @@ namespace Sushi.MailTemplate.Entities
         {
 
         }
+
         /// <summary>
         /// Placeholder ctor
         /// </summary>
@@ -44,6 +39,7 @@ namespace Sushi.MailTemplate.Entities
                 name = value.ToUpper();
             }
         }
+
         /// <summary>
         /// The value of the placeholder
         /// </summary>
